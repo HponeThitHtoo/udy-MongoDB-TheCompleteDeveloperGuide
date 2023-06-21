@@ -1,0 +1,221 @@
+===========================================
+Understanding "deleteOne()" and "deleteMany()"
+===========================================
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3,
+                        "highFrequency" : true,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6,
+                        "goodFrequency" : true
+                }
+        ],
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 4,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 1
+                }
+        ],
+        "phone" : "012177972",
+        "isSporty" : false,
+        "totalAge" : 32
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : null
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 4,
+                        "highFrequency" : true,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 2
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 2
+                }
+        ],
+        "isSporty" : true
+}
+
+> db.users.deleteOne({name: "Chris"})
+{ "acknowledged" : true, "deletedCount" : 1 }
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3,
+                        "highFrequency" : true,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6,
+                        "goodFrequency" : true
+                }
+        ],
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 4,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 1
+                }
+        ],
+        "phone" : "012177972",
+        "isSporty" : false,
+        "totalAge" : 32
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : null
+}
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 2
+                }
+        ],
+        "isSporty" : true
+}
+
+> db.users.deleteMany({totalAge: {$exists: false}, isSporty: true})
+{ "acknowledged" : true, "deletedCount" : 2 }
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 4,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 1
+                }
+        ],
+        "phone" : "012177972",
+        "isSporty" : false,
+        "totalAge" : 32
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : null
+}
+
+
+=============================
+Deleting All Entries in a Collection
+=============================
+db.users.deleteMany({})  >>> recomended for deleting from program (website)
+db.users.drop()  >> not recomended for deleting from program (website), recommended for deleting from shell (cmd)
+

@@ -1,0 +1,2016 @@
+========================================================
+Updating fields with "updateOne()", "updateMany()" and "$set"*+
+========================================================
+> use user
+switched to db user
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "phone" : 131782734
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "age" : 30
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "phone" : "80811987291",
+        "age" : null
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                "Sports",
+                "Cooking",
+                "Hiking"
+        ]
+}
+
+
+> db.users.updateOne({_id: ObjectId("5d9472cf544b6a7f51134ffe")}, {$set: {hobbies: [{title: "Sports", frequency: 5}, {title: "Cooking", frequency: 3}, {title: "Hiking", frequency: 1}]}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.updateOne({_id: ObjectId("5d9472cf544b6a7f51134ffe")}, {$set: {hobbies: [{title: "Sports", frequency: 5}, {title: "Cooking", frequency: 3}, {title: "Hiking", frequency: 1}]}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 0 }
+
+
+> db.users.find({"hobbies.title": "Sports"}).pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "phone" : 131782734
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "phone" : "80811987291",
+        "age" : null
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ]
+}
+> db.users.updateMany({"hobbies.title": "Sports"}, {$set: {isSporty: true}})
+{ "acknowledged" : true, "matchedCount" : 3, "modifiedCount" : 3 }
+> db.users.find({"hobbies.title": "Sports"}).pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "phone" : 131782734,
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "phone" : "80811987291",
+        "age" : null,
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true
+}
+
+
+===============================
+Updating Multiple Fields with "$set"
+===============================
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "phone" : 131782734,
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "age" : 30
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "phone" : "80811987291",
+        "age" : null,
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true
+}
+> db.users.updateOne({_id: ObjectId("5d9472cf544b6a7f51134ffe")}, {$set: {age: 40, phone: 483924792}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "phone" : 131782734,
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "age" : 30
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "phone" : "80811987291",
+        "age" : null,
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "age" : 40,
+        "phone" : 483924792
+}
+
+
+==============================
+Incrementing & Decrementing Values
+=================================
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "phone" : 131782734,
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "age" : 30
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "phone" : "80811987291",
+        "age" : null,
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "age" : 40,
+        "phone" : 483924792
+}
+> db.users.updateOne({name: "Manuel"}, {$inc: {age: 2}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.findOne({name: "Manuel"})
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "age" : 32
+}
+> db.users.updateOne({name: "Manuel"}, {$inc: {age: -1}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.findOne({name: "Manuel"})
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "age" : 31
+}
+> db.users.updateOne({name: "Manuel"}, {$inc: {age: 1}, $set: {isSporty: false}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.findOne({name: "Manuel"})
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "age" : 32,
+        "isSporty" : false
+}
+
+
+> db.users.updateOne({name: "Manuel"}, {$inc: {age: 1}, $set: {age: 30}})
+2019-10-03T14:53:22.699+0630 E  QUERY    [js] WriteError({
+        "index" : 0,
+        "code" : 40,
+        "errmsg" : "Updating the path 'age' would create a conflict at 'age'",
+        "op" : {
+                "q" : {
+                        "name" : "Manuel"
+                },
+                "u" : {
+                        "$inc" : {
+                                "age" : 1
+                        },
+                        "$set" : {
+                                "age" : 30
+                        }
+                },
+                "multi" : false,
+                "upsert" : false
+        }
+}) :
+WriteError({
+        "index" : 0,
+        "code" : 40,
+        "errmsg" : "Updating the path 'age' would create a conflict at 'age'",
+        "op" : {
+                "q" : {
+                        "name" : "Manuel"
+                },
+                "u" : {
+                        "$inc" : {
+                                "age" : 1
+                        },
+                        "$set" : {
+                                "age" : 30
+                        }
+                },
+                "multi" : false,
+                "upsert" : false
+        }
+})
+WriteError@src/mongo/shell/bulk_api.js:458:48
+mergeBatchResults@src/mongo/shell/bulk_api.js:855:49
+executeBatch@src/mongo/shell/bulk_api.js:919:13
+Bulk/this.execute@src/mongo/shell/bulk_api.js:1163:21
+DBCollection.prototype.updateOne@src/mongo/shell/crud_api.js:580:17
+@(shell):1:1
+
+
+=============================
+Using "$min", "$max" and "$mul"
+=============================
+> db.users.findOne({name: "Chris"})
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "age" : 40,
+        "phone" : 483924792
+}
+> db.users.updateOne({name: "Chris"}, {$min: {age: 35}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.findOne({name: "Chris"})
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "age" : 35,
+        "phone" : 483924792
+}
+
+> db.users.updateOne({name: "Chris"}, {$min: {age: 38}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 0 }
+> db.users.findOne({name: "Chris"})
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "age" : 35,
+        "phone" : 483924792
+}
+
+> db.users.findOne({name: "Chris"})
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "age" : 35,
+        "phone" : 483924792
+}
+> db.users.updateOne({name: "Chris"}, {$max: {age: 32}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 0 }
+> db.users.findOne({name: "Chris"})
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "age" : 35,
+        "phone" : 483924792
+}
+> db.users.updateOne({name: "Chris"}, {$max: {age: 38}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.findOne({name: "Chris"})
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "age" : 38,
+        "phone" : 483924792
+}
+
+> db.users.findOne({name: "Chris"})
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "age" : 38,
+        "phone" : 483924792
+}
+> db.users.updateOne({name: "Chris"}, {$mul: {age: 1.1}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.findOne({name: "Chris"})
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "age" : 41.800000000000004,
+        "phone" : 483924792
+}
+
+
+=================================
+Getting Rid of Fields
+==================================
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "phone" : 131782734,
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "age" : 32,
+        "isSporty" : false
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "phone" : "80811987291",
+        "age" : null,
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "age" : 41.800000000000004,
+        "phone" : 483924792
+}
+> db.users.updateMany({isSporty: true}, {$unset: {phone: ""}})
+{ "acknowledged" : true, "matchedCount" : 3, "modifiedCount" : 3 }
+> db.users.find({isSporty: true}).pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "age" : null,
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "age" : 41.800000000000004
+}
+
+
+=======================
+Renaming Fields
+==========================
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "age" : 32,
+        "isSporty" : false
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "age" : null,
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "age" : 41.800000000000004
+}
+> db.users.updateMany({}, {$rename: {age: "totalAge"}})
+{ "acknowledged" : true, "matchedCount" : 4, "modifiedCount" : 3 }
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "isSporty" : false,
+        "totalAge" : 32
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : null
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+
+
+=======================
+Understanding "upsert()"
+=======================
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "isSporty" : false,
+        "totalAge" : 32
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : null
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+> db.users.updateOne({name: "Maria"}, {$set: {age: 29, hobbies: [{title: "Good food", frequency: 3}], isSporty: true}})
+{ "acknowledged" : true, "matchedCount" : 0, "modifiedCount" : 0 }
+> db.users.updateOne({name: "Maria"}, {$set: {age: 29, hobbies: [{title: "Good food", frequency: 3}], isSporty: true}}, {upsert: true})
+{
+        "acknowledged" : true,
+        "matchedCount" : 0,
+        "modifiedCount" : 0,
+        "upsertedId" : ObjectId("5d95b5495ef5ba1925edc6e2")
+}
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "isSporty" : false,
+        "totalAge" : 32
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : null
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3
+                }
+        ],
+        "isSporty" : true
+}
+
+
+=============================
+Updating Matched Array Elements
+=============================
+> db.users.find({$and: [{"hobbies.title": "Sports"}, {"hobbies.frequency": {$gte: 3}}]}).pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : null
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+
+> db.users.find({hobbies: {$elemMatch: {title: "Sports", frequency: {$gte: 3}}}}).pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+
+> db.users.find({hobbies: {$elemMatch: {title: "Sports", frequency: {$gte: 3}}}}).count()
+2
+> db.users.updateMany({hobbies: {$elemMatch: {title: "Sports", frequency: {$gte: 3}}}}, {$set: {"hobbies.$.highFrequency": true}})
+{ "acknowledged" : true, "matchedCount" : 2, "modifiedCount" : 2 }
+> db.users.find({hobbies: {$elemMatch: {title: "Sports", frequency: {$gte: 3}}}}).count()
+2
+> db.users.find({hobbies: {$elemMatch: {title: "Sports", frequency: {$gte: 3}}}}).pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3,
+                        "highFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5,
+                        "highFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+
+
+==============================
+Updating All Array Elements
+==============================
+> db.users.find({"hobbies.frequency": {$gt: 2}}).pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3,
+                        "highFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "isSporty" : false,
+        "totalAge" : 32
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : null
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5,
+                        "highFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3
+                }
+        ],
+        "isSporty" : true
+}
+
+> db.users.find({hobbies: {$elemMatch: {title: "Sports", frequency: {$gte: 3}}}}).count()
+2
+
+> db.users.updateMany({"hobbies.frequency": {$gt: 2}}, {$set: {"hobbies.$.goodFrequency": true}})
+{ "acknowledged" : true, "matchedCount" : 5, "modifiedCount" : 5 }
+> db.users.find({"hobbies.frequency": {$gt: 2}}).pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3,
+                        "highFrequency" : true,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "isSporty" : false,
+        "totalAge" : 32
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : null
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5,
+                        "highFrequency" : true,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                }
+        ],
+        "isSporty" : true
+}
+
+> db.users.find({totalAge: {$gt: 30}}).pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "isSporty" : false,
+        "totalAge" : 32
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 5,
+                        "highFrequency" : true,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+
+> db.users.updateMany({totalAge: {$gt: 30}}, {$inc: {"hobbies.$[].frequency": -1}})
+{ "acknowledged" : true, "matchedCount" : 2, "modifiedCount" : 2 }
+> db.users.find({totalAge: {$gt: 30}}).pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 4,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 1
+                }
+        ],
+        "phone" : "012177972",
+        "isSporty" : false,
+        "totalAge" : 32
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 4,
+                        "highFrequency" : true,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 0
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+
+
+=============================
+Finding & Updating Specific Fields
+=============================
+> db.users.find({"hobbies.frequency": {$gt: 2}}).pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3,
+                        "highFrequency" : true,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 4,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 1
+                }
+        ],
+        "phone" : "012177972",
+        "isSporty" : false,
+        "totalAge" : 32
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : null
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 4,
+                        "highFrequency" : true,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 0
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                }
+        ],
+        "isSporty" : true
+}
+
+***upding all sub document of hobbies array which satify >>> {arrayFilters: [{"el.frequency": {$gt: 2}}]}***
+> db.users.updateMany({"hobbies.frequency": {$gt: 2}}, {$set: {"hobbies.$[el].goodFrequency": true}}, {arrayFilters: [{"el.frequency": {$gt: 2}}]})
+{ "acknowledged" : true, "matchedCount" : 5, "modifiedCount" : 1 }
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3,
+                        "highFrequency" : true,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6,
+                        "goodFrequency" : true
+                }
+        ],
+        "isSporty" : true
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 4,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 1
+                }
+        ],
+        "phone" : "012177972",
+        "isSporty" : false,
+        "totalAge" : 32
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : null
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 4,
+                        "highFrequency" : true,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 0
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                }
+        ],
+        "isSporty" : true
+}
+
+
+=======================
+Adding Elements to Arrays
+=======================
+> use user
+switched to db user
+> db.users.findOne({name: "Maria"})
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                }
+        ],
+        "isSporty" : true
+}
+> db.users.updateOne({name: "Maria"}, {$push: {hobbies: {title: "Sports", frequency: 2}}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.findOne({name: "Maria"})
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                }
+        ],
+        "isSporty" : true
+}
+
+> db.users.updateOne({name: "Maria"}, {$push: {hobbies: {$each: [{title: "Good Wine", frequency: 1}, {title: "Hiking", frequency: 2}], $sort: {frequency: -1}}}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.findOne({name: "Maria"})
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Good Wine",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true
+}
+
+
+============================
+Removing Elements from Arrays
+============================
+> db.users.updateOne({name: "Maria"}, {$push: {hobbies: {$each: [{title: "Good Wine", frequency: 1}, {title: "Hiking", frequency: 2}], $sort: {frequency: -1}}}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.findOne({name: "Maria"})
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Good Wine",
+                        "frequency" : 1
+                },
+                {
+                        "title" : "Good Wine",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true
+}
+
+Removes all array elements that match a specified query.
+--------------------------------------------------------------------------------
+> db.users.updateOne({name: "Maria"}, {$pull: {hobbies: {title: "Hiking"}}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.findOne({name: "Maria"})
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Good Wine",
+                        "frequency" : 1
+                },
+                {
+                        "title" : "Good Wine",
+                        "frequency" : 1
+                }
+        ],
+        "isSporty" : true
+}
+
+> db.users.updateOne({name: "Maria"}, {$pull: {hobbies: {title: "Good Wine"}}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.findOne({name: "Maria"})
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                }
+        ],
+        "isSporty" : true
+}
+
+Removes the first or last item of an array.
+-----------------------------------------------------------
+> db.users.findOne({name: "Chris"})
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 4,
+                        "highFrequency" : true,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 0
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+> db.users.updateOne({name: "Chris"}, {$pop: {hobbies: 1}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.findOne({name: "Chris"})
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 4,
+                        "highFrequency" : true,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 2
+                }
+        ],
+        "isSporty" : true,
+        "totalAge" : 41.800000000000004
+}
+
+
+===================================
+Understanding "$addToSet"
+===================================
+Adds elements to an array only if they do not already exist in the set.
+--------------------------------------------------------------------------------------------------
+> db.users.findOne({name: "Maria"})
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                }
+        ],
+        "isSporty" : true
+}
+> db.users.updateOne({name: "Maria"}, {$addToSet: {hobbies: {title: "Hiking", frequency: 2}}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.users.findOne({name: "Maria"})
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 2
+                }
+        ],
+        "isSporty" : true
+}
+> db.users.updateOne({name: "Maria"}, {$addToSet: {hobbies: {title: "Hiking", frequency: 2}}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 0 }
+> db.users.findOne({name: "Maria"})
+{
+        "_id" : ObjectId("5d95b5495ef5ba1925edc6e2"),
+        "name" : "Maria",
+        "age" : 29,
+        "hobbies" : [
+                {
+                        "title" : "Good food",
+                        "frequency" : 3,
+                        "goodFrequency" : true
+                },
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Hiking",
+                        "frequency" : 2
+                }
+        ],
+        "isSporty" : true
+}
+

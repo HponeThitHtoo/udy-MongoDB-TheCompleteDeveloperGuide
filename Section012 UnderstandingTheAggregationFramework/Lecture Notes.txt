@@ -1,0 +1,1135 @@
+=============================
+Using the Aggregation Framework
+=============================
+> use analytics
+switched to db analytics
+
+
+> db.persons.aggregate([{$match: {gender: "female"}}]).pretty()
+{
+        "_id" : ObjectId("5d98510b37552479a2b7d1da"),
+        "gender" : "female",
+        "name" : {
+                "title" : "mrs",
+                "first" : "olav",
+                "last" : "oehme"
+        },
+        "location" : {
+                "street" : "gartenstraße 64",
+                "city" : "nastätten",
+                "state" : "mecklenburg-vorpommern",
+                "postcode" : 93640,
+                "coordinates" : {
+                        "latitude" : "-52.8348",
+                        "longitude" : "-67.5738"
+                },
+                "timezone" : {
+                        "offset" : "-3:00",
+                        "description" : "Brazil, Buenos Aires, Georgetown"
+                }
+        },
+        "email" : "olav.oehme@example.com",
+        "login" : {
+                "uuid" : "2608c05c-8951-4aee-bcd2-f598c80f32bb",
+                "username" : "heavypeacock371",
+                "password" : "silent",
+                "salt" : "E6R29k0e",
+                "md5" : "587f4392dc06a9fb69a52eae94fd32f2",
+                "sha1" : "82eba68b1fe2407281da5787b9b89505c663b587",
+                "sha256" : "304034638901015d8a7b2fd43530fffc4c7d621ccfab98de935d9c8387198796"
+        },
+        "dob" : {
+                "date" : "1960-11-28T23:07:18Z",
+                "age" : 57
+        },
+        "registered" : {
+                "date" : "2011-05-31T00:24:05Z",
+                "age" : 7
+        },
+        "phone" : "0748-6607336",
+        "cell" : "0176-5787554",
+        "id" : {
+                "name" : "",
+                "value" : null
+        },
+        "picture" : {
+                "large" : "https://randomuser.me/api/portraits/women/6.jpg",
+                "medium" : "https://randomuser.me/api/portraits/med/women/6.jpg",
+                "thumbnail" : "https://randomuser.me/api/portraits/thumb/women/6.jpg"
+        },
+        "nat" : "DE"
+}
+........ and so on .............
+Type "it" for more
+
+
+> db.persons.aggregate([
+...     { $match: { gender: 'female' } },
+...     { $group: { _id: { state: "$location.state" }, totalPersons: { $sum: 1 } } }
+... ]).pretty();
+{ "_id" : { "state" : "فارس" }, "totalPersons" : 7 }
+{ "_id" : { "state" : "mid glamorgan" }, "totalPersons" : 1 }
+{ "_id" : { "state" : "comunidad valenciana" }, "totalPersons" : 10 }
+{ "_id" : { "state" : "haute-loire" }, "totalPersons" : 2 }
+{ "_id" : { "state" : "county fermanagh" }, "totalPersons" : 2 }
+{ "_id" : { "state" : "ceuta" }, "totalPersons" : 7 }
+{ "_id" : { "state" : "michigan" }, "totalPersons" : 1 }
+{ "_id" : { "state" : "nordjylland" }, "totalPersons" : 27 }
+{ "_id" : { "state" : "aude" }, "totalPersons" : 4 }
+{ "_id" : { "state" : "hamburg" }, "totalPersons" : 12 }
+{ "_id" : { "state" : "åland" }, "totalPersons" : 10 }
+{ "_id" : { "state" : "staffordshire" }, "totalPersons" : 3 }
+{ "_id" : { "state" : "hawaii" }, "totalPersons" : 3 }
+{ "_id" : { "state" : "south yorkshire" }, "totalPersons" : 3 }
+{ "_id" : { "state" : "taranaki" }, "totalPersons" : 6 }
+{ "_id" : { "state" : "eure-et-loir" }, "totalPersons" : 2 }
+{ "_id" : { "state" : "tarn-et-garonne" }, "totalPersons" : 5 }
+{ "_id" : { "state" : "ardèche" }, "totalPersons" : 1 }
+{ "_id" : { "state" : "colorado" }, "totalPersons" : 4 }
+{ "_id" : { "state" : "appenzell innerrhoden" }, "totalPersons" : 3 }
+Type "it" for more
+
+
+==============================
+Diving Deeper Into the Group Stage
+==============================
+> db.persons.aggregate([
+...     { $match: { gender: 'female' } },
+...     { $group: { _id: { state: "$location.state" }, totalPersons: { $sum: 1 } } },
+...     { $sort: { totalPersons: -1 } }
+... ]).pretty();
+{ "_id" : { "state" : "midtjylland" }, "totalPersons" : 33 }
+{ "_id" : { "state" : "nordjylland" }, "totalPersons" : 27 }
+{ "_id" : { "state" : "syddanmark" }, "totalPersons" : 24 }
+{
+        "_id" : {
+                "state" : "australian capital territory"
+        },
+        "totalPersons" : 24
+}
+{ "_id" : { "state" : "new south wales" }, "totalPersons" : 24 }
+{ "_id" : { "state" : "south australia" }, "totalPersons" : 22 }
+{ "_id" : { "state" : "danmark" }, "totalPersons" : 21 }
+{ "_id" : { "state" : "hovedstaden" }, "totalPersons" : 21 }
+{ "_id" : { "state" : "overijssel" }, "totalPersons" : 20 }
+{ "_id" : { "state" : "queensland" }, "totalPersons" : 20 }
+{ "_id" : { "state" : "sjælland" }, "totalPersons" : 19 }
+{ "_id" : { "state" : "nova scotia" }, "totalPersons" : 17 }
+{ "_id" : { "state" : "gelderland" }, "totalPersons" : 16 }
+{ "_id" : { "state" : "yukon" }, "totalPersons" : 16 }
+{ "_id" : { "state" : "canterbury" }, "totalPersons" : 16 }
+{ "_id" : { "state" : "northwest territories" }, "totalPersons" : 16 }
+{ "_id" : { "state" : "northern territory" }, "totalPersons" : 15 }
+{ "_id" : { "state" : "bayern" }, "totalPersons" : 15 }
+{ "_id" : { "state" : "tasmania" }, "totalPersons" : 15 }
+{ "_id" : { "state" : "victoria" }, "totalPersons" : 14 }
+Type "it" for more
+
+
+===================
+Working with $project
+===================
+db.persons.aggregate([
+    {
+      $project: {
+        _id: 0,
+        gender: 1,
+        fullName: {
+          $concat: [
+            { $toUpper: { $substrCP: ['$name.first', 0, 1] } },
+            {
+              $substrCP: [
+                '$name.first',
+                1,
+                { $subtract: [{ $strLenCP: '$name.first' }, 1] }
+              ]
+            },
+            ' ',
+            { $toUpper: { $substrCP: ['$name.last', 0, 1] } },
+            {
+              $substrCP: [
+                '$name.last',
+                1,
+                { $subtract: [{ $strLenCP: '$name.last' }, 1] }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]).pretty();
+
+{ "gender" : "male", "fullName" : "Elijah Lewis" }
+{ "gender" : "female", "fullName" : "Olav Oehme" }
+{ "gender" : "female", "fullName" : "Madeleine Till" }
+{ "gender" : "female", "fullName" : "Shona Kemperman" }
+{ "gender" : "female", "fullName" : "Louise Graham" }
+{ "gender" : "male", "fullName" : "Isolino Viana" }
+{ "gender" : "female", "fullName" : "Mestan Kaplangı" }
+{ "gender" : "male", "fullName" : "Harvey Chambers" }
+{ "gender" : "female", "fullName" : "Katie Welch" }
+{ "gender" : "male", "fullName" : "Carl Jacobs" }
+{ "gender" : "female", "fullName" : "Sandra Lorenzo" }
+{ "gender" : "male", "fullName" : "بنیامین سالاری" }
+{ "gender" : "male", "fullName" : "Victor Pedersen" }
+{ "gender" : "male", "fullName" : "Zachary Lo" }
+{ "gender" : "female", "fullName" : "پریا پارسا" }
+{ "gender" : "female", "fullName" : "Andreia Arnaud" }
+{ "gender" : "female", "fullName" : "Maeva Grewal" }
+{ "gender" : "male", "fullName" : "Gideon Van drongelen" }
+{ "gender" : "female", "fullName" : "Gonca Alnıaçık" }
+{ "gender" : "female", "fullName" : "Signe Rasmussen" }
+Type "it" for more
+
+
+======================================
+Turning the Location Into a geoJSON Object
+======================================
+db.persons.aggregate([
+    {
+      $project: {
+        _id: 0,
+        name: 1,
+        email: 1,
+        age: "$dob.age",
+        location: {
+          type: 'Point',
+          coordinates: [
+            {
+              $convert: {
+                input: '$location.coordinates.longitude',
+                to: 'double',
+                onError: 0.0,
+                onNull: 0.0
+              }
+            },
+            {
+              $convert: {
+                input: '$location.coordinates.latitude',
+                to: 'double',
+                onError: 0.0,
+                onNull: 0.0
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      $project: {
+        gender: 1,
+        email: 1,
+        location: 1,
+        age: 1,
+        fullName: {
+          $concat: [
+            { $toUpper: { $substrCP: ['$name.first', 0, 1] } },
+            {
+              $substrCP: [
+                '$name.first',
+                1,
+                { $subtract: [{ $strLenCP: '$name.first' }, 1] }
+              ]
+            },
+            ' ',
+            { $toUpper: { $substrCP: ['$name.last', 0, 1] } },
+            {
+              $substrCP: [
+                '$name.last',
+                1,
+                { $subtract: [{ $strLenCP: '$name.last' }, 1] }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]).pretty();
+
+{
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        130.0105,
+                        88.1818
+                ]
+        },
+        "email" : "gonca.alnıaçık@example.com",
+        "age" : 29,
+        "fullName" : "Gonca Alnıaçık"
+}
+{
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        14.0142,
+                        18.2563
+                ]
+        },
+        "email" : "signe.rasmussen@example.com",
+        "age" : 35,
+        "fullName" : "Signe Rasmussen"
+}
+Type "it" for more
+
+
+=======================
+Transforming the Birthdate
+=======================
+db.persons.aggregate([
+    {
+      $project: {
+        _id: 0,
+        name: 1,
+        email: 1,
+        birthdate: { $convert: { input: '$dob.date', to: 'date' } },
+        age: "$dob.age",
+        location: {
+          type: 'Point',
+          coordinates: [
+            {
+              $convert: {
+                input: '$location.coordinates.longitude',
+                to: 'double',
+                onError: 0.0,
+                onNull: 0.0
+              }
+            },
+            {
+              $convert: {
+                input: '$location.coordinates.latitude',
+                to: 'double',
+                onError: 0.0,
+                onNull: 0.0
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      $project: {
+        gender: 1,
+        email: 1,
+        location: 1,
+        birthdate: 1,
+        age: 1,
+        fullName: {
+          $concat: [
+            { $toUpper: { $substrCP: ['$name.first', 0, 1] } },
+            {
+              $substrCP: [
+                '$name.first',
+                1,
+                { $subtract: [{ $strLenCP: '$name.first' }, 1] }
+              ]
+            },
+            ' ',
+            { $toUpper: { $substrCP: ['$name.last', 0, 1] } },
+            {
+              $substrCP: [
+                '$name.last',
+                1,
+                { $subtract: [{ $strLenCP: '$name.last' }, 1] }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]).pretty();
+
+{
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        130.0105,
+                        88.1818
+                ]
+        },
+        "email" : "gonca.alnıaçık@example.com",
+        "birthdate" : ISODate("1988-11-08T00:18:59Z"),
+        "age" : 29,
+        "fullName" : "Gonca Alnıaçık"
+}
+{
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        14.0142,
+                        18.2563
+                ]
+        },
+        "email" : "signe.rasmussen@example.com",
+        "birthdate" : ISODate("1983-05-20T21:26:44Z"),
+        "age" : 35,
+        "fullName" : "Signe Rasmussen"
+}
+Type "it" for more
+
+
+===============================
+Using Shortcuts for Transformations
+===============================
+db.persons.aggregate([
+    {
+      $project: {
+        _id: 0,
+        name: 1,
+        email: 1,
+        birthdate: { $toDate: '$dob.date' },
+        age: "$dob.age",
+        location: {
+          type: 'Point',
+          coordinates: [
+            {
+              $convert: {
+                input: '$location.coordinates.longitude',
+                to: 'double',
+                onError: 0.0,
+                onNull: 0.0
+              }
+            },
+            {
+              $convert: {
+                input: '$location.coordinates.latitude',
+                to: 'double',
+                onError: 0.0,
+                onNull: 0.0
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      $project: {
+        gender: 1,
+        email: 1,
+        location: 1,
+        birthdate: 1,
+        age: 1,
+        fullName: {
+          $concat: [
+            { $toUpper: { $substrCP: ['$name.first', 0, 1] } },
+            {
+              $substrCP: [
+                '$name.first',
+                1,
+                { $subtract: [{ $strLenCP: '$name.first' }, 1] }
+              ]
+            },
+            ' ',
+            { $toUpper: { $substrCP: ['$name.last', 0, 1] } },
+            {
+              $substrCP: [
+                '$name.last',
+                1,
+                { $subtract: [{ $strLenCP: '$name.last' }, 1] }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]).pretty();
+
+
+{
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        130.0105,
+                        88.1818
+                ]
+        },
+        "email" : "gonca.alnıaçık@example.com",
+        "birthdate" : ISODate("1988-11-08T00:18:59Z"),
+        "age" : 29,
+        "fullName" : "Gonca Alnıaçık"
+}
+{
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        14.0142,
+                        18.2563
+                ]
+        },
+        "email" : "signe.rasmussen@example.com",
+        "birthdate" : ISODate("1983-05-20T21:26:44Z"),
+        "age" : 35,
+        "fullName" : "Signe Rasmussen"
+}
+Type "it" for more
+
+
+====================================
+Understanding the $isoWeekYear Operator
+====================================
+db.persons.aggregate([
+    {
+      $project: {
+        _id: 0,
+        name: 1,
+        email: 1,
+        birthdate: { $toDate: '$dob.date' },
+        age: "$dob.age",
+        location: {
+          type: 'Point',
+          coordinates: [
+            {
+              $convert: {
+                input: '$location.coordinates.longitude',
+                to: 'double',
+                onError: 0.0,
+                onNull: 0.0
+              }
+            },
+            {
+              $convert: {
+                input: '$location.coordinates.latitude',
+                to: 'double',
+                onError: 0.0,
+                onNull: 0.0
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      $project: {
+        gender: 1,
+        email: 1,
+        location: 1,
+        birthdate: 1,
+        age: 1,
+        fullName: {
+          $concat: [
+            { $toUpper: { $substrCP: ['$name.first', 0, 1] } },
+            {
+              $substrCP: [
+                '$name.first',
+                1,
+                { $subtract: [{ $strLenCP: '$name.first' }, 1] }
+              ]
+            },
+            ' ',
+            { $toUpper: { $substrCP: ['$name.last', 0, 1] } },
+            {
+              $substrCP: [
+                '$name.last',
+                1,
+                { $subtract: [{ $strLenCP: '$name.last' }, 1] }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    { $group: { _id: { birthYear: { $isoWeekYear: "$birthdate" } }, numPersons: { $sum: 1 } } },
+    { $sort: { numPersons: -1 } }
+  ]).pretty();
+
+
+{ "_id" : { "birthYear" : NumberLong(1955) }, "numPersons" : 113 }
+{ "_id" : { "birthYear" : NumberLong(1961) }, "numPersons" : 111 }
+{ "_id" : { "birthYear" : NumberLong(1993) }, "numPersons" : 110 }
+{ "_id" : { "birthYear" : NumberLong(1960) }, "numPersons" : 110 }
+{ "_id" : { "birthYear" : NumberLong(1975) }, "numPersons" : 107 }
+{ "_id" : { "birthYear" : NumberLong(1945) }, "numPersons" : 106 }
+{ "_id" : { "birthYear" : NumberLong(1976) }, "numPersons" : 105 }
+{ "_id" : { "birthYear" : NumberLong(1967) }, "numPersons" : 104 }
+{ "_id" : { "birthYear" : NumberLong(1990) }, "numPersons" : 103 }
+{ "_id" : { "birthYear" : NumberLong(1994) }, "numPersons" : 102 }
+{ "_id" : { "birthYear" : NumberLong(1981) }, "numPersons" : 102 }
+{ "_id" : { "birthYear" : NumberLong(1958) }, "numPersons" : 101 }
+{ "_id" : { "birthYear" : NumberLong(1995) }, "numPersons" : 101 }
+{ "_id" : { "birthYear" : NumberLong(1948) }, "numPersons" : 100 }
+{ "_id" : { "birthYear" : NumberLong(1946) }, "numPersons" : 100 }
+{ "_id" : { "birthYear" : NumberLong(1983) }, "numPersons" : 99 }
+{ "_id" : { "birthYear" : NumberLong(1970) }, "numPersons" : 99 }
+{ "_id" : { "birthYear" : NumberLong(1950) }, "numPersons" : 99 }
+{ "_id" : { "birthYear" : NumberLong(1963) }, "numPersons" : 98 }
+{ "_id" : { "birthYear" : NumberLong(1965) }, "numPersons" : 98 }
+Type "it" for more
+
+
+================
+$group vs $project
+================
+
+
+======================================
+Pushing Elements Into Newly Created Arrays
+======================================
+> db.friends.aggregate([
+...     { $group: { _id: { age: "$age" }, allHobbies: { $push: "$hobbies" } } }
+...   ]).pretty();
+{
+        "_id" : {
+                "age" : 29
+        },
+        "allHobbies" : [
+                [
+                        "Sports",
+                        "Cooking"
+                ],
+                [
+                        "Cooking",
+                        "Skiing"
+                ]
+        ]
+}
+{
+        "_id" : {
+                "age" : 30
+        },
+        "allHobbies" : [
+                [
+                        "Eating",
+                        "Data Analytics"
+                ]
+        ]
+}
+
+
+=============================
+Understanding the $unwind Stage
+=============================
+*** $unwind >> covert array to flat (single document)
+*** So, here $unwind the array frist, so they are now single document, then group with $push, so >> become allHobbies array but with duplicate values
+
+> db.friends.aggregate([
+...     { $unwind: "$hobbies" },
+...     { $group: { _id: { age: "$age" }, allHobbies: { $push: "$hobbies" } } }
+...   ]).pretty();
+{
+        "_id" : {
+                "age" : 29
+        },
+        "allHobbies" : [
+                "Sports",
+                "Cooking",
+                "Cooking",
+                "Skiing"
+        ]
+}
+{
+        "_id" : {
+                "age" : 30
+        },
+        "allHobbies" : [
+                "Eating",
+                "Data Analytics"
+        ]
+}
+
+
+========================
+Eliminating Duplicate Values
+========================
+*** $unwind >> covert array to flat (single document)
+*** So, here $unwind the array frist, so they are now single document, then group with $addToSet, so >> become allHobbies array without duplicate values
+
+> db.friends.aggregate([
+...     { $unwind: "$hobbies" },
+...     { $group: { _id: { age: "$age" }, allHobbies: { $addToSet: "$hobbies" } } }
+...   ]).pretty();
+{
+        "_id" : {
+                "age" : 29
+        },
+        "allHobbies" : [
+                "Skiing",
+                "Sports",
+                "Cooking"
+        ]
+}
+{
+        "_id" : {
+                "age" : 30
+        },
+        "allHobbies" : [
+                "Eating",
+                "Data Analytics"
+        ]
+}
+
+
+========================
+Using Projection with Arrays
+========================
+> db.friends.aggregate([
+...     { $project: { _id: 0, examScore: { $slice: ["$examScores", 2, 1] } } }
+...   ]).pretty();
+{ "examScore" : [ { "difficulty" : 3, "score" : 88.5 } ] }
+{ "examScore" : [ { "difficulty" : 5, "score" : 53.1 } ] }
+{ "examScore" : [ { "difficulty" : 6, "score" : 61.5 } ] }
+
+
+==========================
+Getting the Length of an Array
+==========================
+> db.friends.aggregate([
+...     { $project: { _id: 0, numScores: { $size: "$examScores" } } }
+...   ]).pretty();
+{ "numScores" : 3 }
+{ "numScores" : 3 }
+{ "numScores" : 3 }
+
+
+======================
+Using the $filter Operator
+======================
+> db.friends.aggregate([
+...     {
+...       $project: {
+...         _id: 0,
+...         scores: { $filter: { input: '$examScores', as: 'sc', cond: { $gt: ["$$sc.score", 60] } } }
+...       }
+...     }
+...   ]).pretty();
+{
+        "scores" : [
+                {
+                        "difficulty" : 6,
+                        "score" : 62.1
+                },
+                {
+                        "difficulty" : 3,
+                        "score" : 88.5
+                }
+        ]
+}
+{ "scores" : [ { "difficulty" : 2, "score" : 74.3 } ] }
+{
+        "scores" : [
+                {
+                        "difficulty" : 3,
+                        "score" : 75.1
+                },
+                {
+                        "difficulty" : 6,
+                        "score" : 61.5
+                }
+        ]
+}
+
+
+====================================
+Applying Multiple Operations to our Array
+====================================
+> db.friends.aggregate([
+...     { $unwind: "$examScores" },
+...     { $project: { _id: 1, name: 1, age: 1, score: "$examScores.score" } },
+...     { $sort: { score: -1 } },
+...     { $group: { _id: "$_id", name: { $first: "$name" }, maxScore: { $max: "$score" } } },
+...     { $sort: { maxScore: -1 } }
+...   ]).pretty();
+{
+        "_id" : ObjectId("5d989f3f9104d629b1300eec"),
+        "name" : "Max",
+        "maxScore" : 88.5
+}
+{
+        "_id" : ObjectId("5d989f3f9104d629b1300eee"),
+        "name" : "Maria",
+        "maxScore" : 75.1
+}
+{
+        "_id" : ObjectId("5d989f3f9104d629b1300eed"),
+        "name" : "Manu",
+        "maxScore" : 74.3
+}
+
+
+====================
+Understanding $bucket
+====================
+> db.persons.aggregate([
+...     {
+...       $bucket: {
+...         groupBy: '$dob.age',
+...         boundaries: [18, 30, 40, 50, 60, 120],
+...         output: {
+...           numPersons: { $sum: 1 },
+...           averageAge: { $avg: '$dob.age' }
+...         }
+...       }
+...     }
+...   ]).pretty()
+{ "_id" : 18, "numPersons" : 868, "averageAge" : 25.101382488479263 }
+{ "_id" : 30, "numPersons" : 910, "averageAge" : 34.51758241758242 }
+{ "_id" : 40, "numPersons" : 918, "averageAge" : 44.42265795206972 }
+{ "_id" : 50, "numPersons" : 976, "averageAge" : 54.533811475409834 }
+{ "_id" : 60, "numPersons" : 1328, "averageAge" : 66.55798192771084 }
+
+
+> db.persons.aggregate([
+...     {
+...       $bucketAuto: {
+...         groupBy: '$dob.age',
+...         buckets: 5,
+...         output: {
+...           numPersons: { $sum: 1 },
+...           averageAge: { $avg: '$dob.age' }
+...         }
+...       }
+...     }
+...   ]).pretty()
+{
+        "_id" : {
+                "min" : 21,
+                "max" : 32
+        },
+        "numPersons" : 1042,
+        "averageAge" : 25.99616122840691
+}
+{
+        "_id" : {
+                "min" : 32,
+                "max" : 43
+        },
+        "numPersons" : 1010,
+        "averageAge" : 36.97722772277228
+}
+{
+        "_id" : {
+                "min" : 43,
+                "max" : 54
+        },
+        "numPersons" : 1033,
+        "averageAge" : 47.98838334946757
+}
+{
+        "_id" : {
+                "min" : 54,
+                "max" : 65
+        },
+        "numPersons" : 1064,
+        "averageAge" : 58.99342105263158
+}
+{
+        "_id" : {
+                "min" : 65,
+                "max" : 74
+        },
+        "numPersons" : 851,
+        "averageAge" : 69.11515863689776
+}
+
+
+=========================
+Divnig Into Additional Stages
+=========================
+> db.persons.aggregate([
+...     { $match: { gender: "male" } },
+...     { $project: { _id: 0, gender: 1, name: { $concat: ["$name.first", " ", "$name.last"] }, birthdate: { $toDate: "$dob.date" } } },
+...     { $sort: { birthdate: 1 } },
+...     { $skip: 10 },
+...     { $limit: 10 }
+...   ]).pretty()
+{
+        "gender" : "male",
+        "name" : "pierre boyer",
+        "birthdate" : ISODate("1945-01-01T22:35:55Z")
+}
+{
+        "gender" : "male",
+        "name" : "emile noel",
+        "birthdate" : ISODate("1945-01-10T03:05:21Z")
+}
+{
+        "gender" : "male",
+        "name" : "torgeir apeland",
+        "birthdate" : ISODate("1945-01-13T17:04:33Z")
+}
+{
+        "gender" : "male",
+        "name" : "igor kvistad",
+        "birthdate" : ISODate("1945-01-17T22:13:14Z")
+}
+{
+        "gender" : "male",
+        "name" : "mariusz gabler",
+        "birthdate" : ISODate("1945-01-22T06:16:30Z")
+}
+{
+        "gender" : "male",
+        "name" : "lewis freeman",
+        "birthdate" : ISODate("1945-01-28T20:15:28Z")
+}
+{
+        "gender" : "male",
+        "name" : "theodore moore",
+        "birthdate" : ISODate("1945-02-10T03:34:29Z")
+}
+{
+        "gender" : "male",
+        "name" : "florian mercier",
+        "birthdate" : ISODate("1945-02-22T04:18:31Z")
+}
+{
+        "gender" : "male",
+        "name" : "dursun schellekens",
+        "birthdate" : ISODate("1945-02-22T07:28:00Z")
+}
+{
+        "gender" : "male",
+        "name" : "marcel rey",
+        "birthdate" : ISODate("1945-02-28T02:18:01Z")
+}
+
+
+=======================================
+Writing Pipeline Results Into a New Collection
+=======================================
+> db.persons.aggregate([
+...     {
+...       $project: {
+...         _id: 0,
+...         name: 1,
+...         email: 1,
+...         birthdate: { $toDate: '$dob.date' },
+...         age: "$dob.age",
+...         location: {
+...           type: 'Point',
+...           coordinates: [
+...             {
+...               $convert: {
+...                 input: '$location.coordinates.longitude',
+...                 to: 'double',
+...                 onError: 0.0,
+...                 onNull: 0.0
+...               }
+...             },
+...             {
+...               $convert: {
+...                 input: '$location.coordinates.latitude',
+...                 to: 'double',
+...                 onError: 0.0,
+...                 onNull: 0.0
+...               }
+...             }
+...           ]
+...         }
+...       }
+...     },
+...     {
+...       $project: {
+...         gender: 1,
+...         email: 1,
+...         location: 1,
+...         birthdate: 1,
+...         age: 1,
+...         fullName: {
+...           $concat: [
+...             { $toUpper: { $substrCP: ['$name.first', 0, 1] } },
+...             {
+...               $substrCP: [
+...                 '$name.first',
+...                 1,
+...                 { $subtract: [{ $strLenCP: '$name.first' }, 1] }
+...               ]
+...             },
+...             ' ',
+...             { $toUpper: { $substrCP: ['$name.last', 0, 1] } },
+...             {
+...               $substrCP: [
+...                 '$name.last',
+...                 1,
+...                 { $subtract: [{ $strLenCP: '$name.last' }, 1] }
+...               ]
+...             }
+...           ]
+...         }
+...       }
+...     },
+...     { $out: "transformedPersons" }
+...   ])
+> show collections
+friends
+persons
+transformedPersons
+
+
+=============================
+Working with the $geoNear Stage
+=============================
+> db.transformedPersons.createIndex({location: "2dsphere"})
+{
+        "createdCollectionAutomatically" : false,
+        "numIndexesBefore" : 1,
+        "numIndexesAfter" : 2,
+        "ok" : 1
+}
+
+
+> db.transformedPersons.aggregate([
+...     {
+...       $geoNear: {
+...         near: {
+...           type: 'Point',
+...           coordinates: [-18.4, -42.8]
+...         },
+...         maxDistance: 1000000,
+...         query: { age: { $gt: 30 } },
+...         distanceField: "distance"
+...       }
+...     },
+...     { $limit: 10 }
+...   ]).pretty()
+{
+        "_id" : ObjectId("5d98bf73f089349162e5fb70"),
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        -18.5996,
+                        -42.6128
+                ]
+        },
+        "email" : "elijah.lewis@example.com",
+        "birthdate" : ISODate("1986-03-29T06:40:18Z"),
+        "age" : 32,
+        "fullName" : "Elijah Lewis",
+        "distance" : 26473.52536319881
+}
+{
+        "_id" : ObjectId("5d98bf73f089349162e606f2"),
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        -16.8251,
+                        -41.9369
+                ]
+        },
+        "email" : "delores.thompson@example.com",
+        "birthdate" : ISODate("1984-04-11T07:34:45Z"),
+        "age" : 34,
+        "fullName" : "Delores Thompson",
+        "distance" : 161267.42830913173
+}
+{
+        "_id" : ObjectId("5d98bf73f089349162e60a30"),
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        -19.5492,
+                        -44.8346
+                ]
+        },
+        "email" : "kajus.moldskred@example.com",
+        "birthdate" : ISODate("1978-09-12T00:25:23Z"),
+        "age" : 39,
+        "fullName" : "Kajus Moldskred",
+        "distance" : 244569.7553327739
+}
+{
+        "_id" : ObjectId("5d98bf73f089349162e6070f"),
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        -20.6738,
+                        -40.2524
+                ]
+        },
+        "email" : "christian.møller@example.com",
+        "birthdate" : ISODate("1967-07-18T04:08:25Z"),
+        "age" : 51,
+        "fullName" : "Christian Møller",
+        "distance" : 341047.8914183129
+}
+{
+        "_id" : ObjectId("5d98bf73f089349162e5fea3"),
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        -12.8517,
+                        -44.2241
+                ]
+        },
+        "email" : "kübra.oraloğlu@example.com",
+        "birthdate" : ISODate("1981-03-12T02:46:43Z"),
+        "age" : 37,
+        "fullName" : "Kübra Oraloğlu",
+        "distance" : 475031.1813780212
+}
+{
+        "_id" : ObjectId("5d98bf73f089349162e60850"),
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        -24.1976,
+                        -42.2063
+                ]
+        },
+        "email" : "gökhan.topaloğlu@example.com",
+        "birthdate" : ISODate("1954-04-17T19:24:48Z"),
+        "age" : 64,
+        "fullName" : "Gökhan Topaloğlu",
+        "distance" : 480270.5071752365
+}
+{
+        "_id" : ObjectId("5d98bf73f089349162e60753"),
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        -15.6018,
+                        -38.2254
+                ]
+        },
+        "email" : "ayşe.eliçin@example.com",
+        "birthdate" : ISODate("1959-02-26T17:16:38Z"),
+        "age" : 59,
+        "fullName" : "Ayşe Eliçin",
+        "distance" : 561521.5914865345
+}
+{
+        "_id" : ObjectId("5d98bf73f089349162e602e9"),
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        -23.0621,
+                        -47.0624
+                ]
+        },
+        "email" : "chloe.ennis@example.com",
+        "birthdate" : ISODate("1956-07-16T00:28:06Z"),
+        "age" : 62,
+        "fullName" : "Chloe Ennis",
+        "distance" : 599870.3100224736
+}
+{
+        "_id" : ObjectId("5d98bf73f089349162e60e0a"),
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        -26.0729,
+                        -42.8626
+                ]
+        },
+        "email" : "kuzey.berberoğlu@example.com",
+        "birthdate" : ISODate("1984-08-27T19:20:20Z"),
+        "age" : 34,
+        "fullName" : "Kuzey Berberoğlu",
+        "distance" : 626211.846542541
+}
+{
+        "_id" : ObjectId("5d98bf73f089349162e60619"),
+        "location" : {
+                "type" : "Point",
+                "coordinates" : [
+                        -10.6398,
+                        -41.7477
+                ]
+        },
+        "email" : "nellie.chapman@example.com",
+        "birthdate" : ISODate("1982-12-27T07:32:35Z"),
+        "age" : 35,
+        "fullName" : "Nellie Chapman",
+        "distance" : 649597.0679432369
+}
+
+

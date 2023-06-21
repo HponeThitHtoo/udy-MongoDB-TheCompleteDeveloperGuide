@@ -1,0 +1,100 @@
+================
+Working with int32
+================
+db.persons.insertOne({age: NumberInt("29")})
+
+
+=================
+Working with int64
+=================
+db.companies.insertOne({valuation: NumberLong("9223372036854775807")})
+
+
+==================================
+Doing Maths with Floats int32s & int64s
+==================================
+db.accounts.insertOne({name: "Max", amount: NumberInt("10")})
+
+db.accounts.updateOne({}, {$inc: {amount: NumberInt("10")}})
+
+db.companies.insertOne({valuation: NumberLong("123456789123456789")})
+
+db.companies.updateOne({}, {$inc: {valuation: NumberLong("1")}})
+
+
+===============================
+What's Wrong with Normal Doubles?
+===============================
+> use analytics
+switched to db analytics
+
+> db.science.insertOne({a: 0.3, b: 0.1})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d99a80ad7a78ea821eb5351")
+}
+
+> db.science.find().pretty()
+{ "_id" : ObjectId("5d99a80ad7a78ea821eb5351"), "a" : 0.3, "b" : 0.1 }
+
+> db.science.aggregate([{$project: {result: {$subtract: ["$a", "$b"]}}}])
+{ "_id" : ObjectId("5d99a80ad7a78ea821eb5351"), "result" : 0.19999999999999998 }
+
+
+=========================
+Working with Decimal 128bit
+=========================
+> db.science.deleteMany({})
+{ "acknowledged" : true, "deletedCount" : 1 }
+
+
+> db.science.insertOne({a: NumberDecimal("0.3"), b: NumberDecimal("0.1")})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d99aa4bd7a78ea821eb5352")
+}
+> db.science.find().pretty()
+{
+        "_id" : ObjectId("5d99aa4bd7a78ea821eb5352"),
+        "a" : NumberDecimal("0.3"),
+        "b" : NumberDecimal("0.1")
+}
+> db.science.aggregate([{$project: {result: {$subtract: ["$a", "$b"]}}}])
+{ "_id" : ObjectId("5d99aa4bd7a78ea821eb5352"), "result" : NumberDecimal("0.2") }
+
+
+> db.science.updateOne({}, {$inc: {a: 0.1}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.science.find().pretty()
+{
+        "_id" : ObjectId("5d99aa4bd7a78ea821eb5352"),
+        "a" : NumberDecimal("0.400000000000000"),
+        "b" : NumberDecimal("0.1")
+}
+
+
+> db.science.deleteMany({})
+{ "acknowledged" : true, "deletedCount" : 1 }
+
+
+> db.science.insertOne({a: NumberDecimal("0.3"), b: NumberDecimal("0.1")})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d99aad5d7a78ea821eb5353")
+}
+> db.science.find().pretty()
+{
+        "_id" : ObjectId("5d99aad5d7a78ea821eb5353"),
+        "a" : NumberDecimal("0.3"),
+        "b" : NumberDecimal("0.1")
+}
+> db.science.updateOne({}, {$inc: {a: NumberDecimal("0.1")}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.science.find().pretty()
+{
+        "_id" : ObjectId("5d99aad5d7a78ea821eb5353"),
+        "a" : NumberDecimal("0.4"),
+        "b" : NumberDecimal("0.1")
+}
+
+

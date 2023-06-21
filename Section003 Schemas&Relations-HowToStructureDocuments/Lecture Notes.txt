@@ -1,0 +1,521 @@
+db.products.insertOne({name: "A book", price: 12.99})
+db.products.insertOne({title: "T-Shirt", seller: {name: "Max", age: 29}})
+
+db.products.insertOne({name: "A book", price: 12.99})
+db.products.insertOne({name: "A T-Shirt", price: 20.99})
+db.products.insertOne({name: "A Computer", price: 1299, details: {cpu: "Intel i7 8770"}})
+
+db.products.insertOne({name: "A book", price: 12.99, details: null})
+db.products.insertOne({name: "A T-Shirt", price: 20.99, details: null})
+db.products.insertOne({name: "A Computer", price: 1299, details: {cpu: "Intel i7 8770"}})
+
+db.companies.insertOne({name: "Fresh Apples Inc", isStartup: true, employees: 33, funding: 12345678901234567890, details: {ceo: "Mark Super"}, tags: [{title: "super"}, {title: "perfect"}], foundingDate: new Date(), insertedAt: new Timestamp()})
+db.numbers.insertOne({a: 1})
+db.stats()
+db.companies.drop()
+db.stats()
+db.numbers.deleteMany({})
+db.stats()
+db.numbers.insertOne({a: NumberInt(1)})
+db.stats()
+> typeof db.numbers.findOne().a
+number
+
+========
+
+use hospital
+db.patients.insertOne({name: "Max", age: 29, diseaseSummary: "summary-max-1"})
+db.patients.findOne()
+db.diseaseSummaries.insertOne({_id: "summary-max-1", diseases: ["cold", "broken leg"]})
+db.diseaseSummaries.findOne()
+
+> db.patients.findOne()
+{
+        "_id" : ObjectId("5d90733d5949902e9c82d41f"),
+        "name" : "Max",
+        "age" : 29,
+        "diseaseSummary" : "summary-max-1"
+}
+> db.patients.findOne().diseaseSummary
+summary-max-1
+> var dsid = db.patients.findOne().diseaseSummary
+> dsid
+summary-max-1
+> db.diseaseSummaries.findOne({_id: dsid})
+{ "_id" : "summary-max-1", "diseases" : [ "cold", "broken leg" ] }
+> db.patients.deleteMany({})
+{ "acknowledged" : true, "deletedCount" : 1 }
+> db.patients.insertOne({name: "Max", age: 29, diseaseSummary: {diseases: ["cold", "broken leg"]}})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d9075af5949902e9c82d420")
+}
+> db.patients.findOne()
+{
+        "_id" : ObjectId("5d9075af5949902e9c82d420"),
+        "name" : "Max",
+        "age" : 29,
+        "diseaseSummary" : {
+                "diseases" : [
+                        "cold",
+                        "broken leg"
+                ]
+        }
+}
+
+====================
+one to one embedded
+====================
+
+> use cardData
+switched to db cardData
+> db.persons.insertOne({name: "Max", car: {model: "BMW", price: 40000}})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d9077305949902e9c82d421")
+}
+> db.persons.findOne()
+{
+        "_id" : ObjectId("5d9077305949902e9c82d421"),
+        "name" : "Max",
+        "car" : {
+                "model" : "BMW",
+                "price" : 40000
+        }
+}
+
+one to one references
+===================
+> db.persons.deleteMany({})
+{ "acknowledged" : true, "deletedCount" : 1 }
+> db.persons.insertOne({name: "Max", age: 29, salary: 3000})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d9077de5949902e9c82d422")
+}
+> db.cars.insertOne({model: "BMW", price: 40000, owner: ObjectId("5d9077de5949902e9c82d422")})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d9078035949902e9c82d423")
+}
+
+======================
+one to many embedded
+====================
+> use support
+switched to db support
+> db.questionThreads.insertOne({creator: "Max", question: "How does that all work?", answers: ["q1a1", "q1a2"]})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d90b5b8ea5549345638f86d")
+}
+> db.questionThreads.findOne()
+{
+        "_id" : ObjectId("5d90b5b8ea5549345638f86d"),
+        "creator" : "Max",
+        "question" : "How does that all work?",
+        "answers" : [
+                "q1a1",
+                "q1a2"
+        ]
+}
+> db.answers.insertMany([{_id: "q1a1", text: "It works like that."}, {_id: "q1a2", text: "Thanks!"}])
+{ "acknowledged" : true, "insertedIds" : [ "q1a1", "q1a2" ] }
+> db.answers.find()
+{ "_id" : "q1a1", "text" : "It works like that." }
+{ "_id" : "q1a2", "text" : "Thanks!" }
+
+one to many references
+====================
+> db.answers.deleteMany({})
+{ "acknowledged" : true, "deletedCount" : 1 }
+> db.answers.insertMany([{_id: "q1a1", text: "It works like that."}, {_id: "q1a2", text: "Thanks!"}])
+{ "acknowledged" : true, "insertedIds" : [ "q1a1", "q1a2" ] }
+> db.answers.find()
+{ "_id" : "q1a1", "text" : "It works like that." }
+{ "_id" : "q1a2", "text" : "Thanks!" }
+> db.questionThreads.deleteMany({})
+{ "acknowledged" : true, "deletedCount" : 1 }
+> db.questionThreads.insertOne({creator: "Max", question: "How does that work?", answers: [{text: "It works like that."}, {text: "Thanks!"}]})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d90b813ea5549345638f86e")
+}
+> db.questionThreads.findOne()
+{
+        "_id" : ObjectId("5d90b813ea5549345638f86e"),
+        "creator" : "Max",
+        "question" : "How does that work?",
+        "answers" : [
+                {
+                        "text" : "It works like that."
+                },
+                {
+                        "text" : "Thanks!"
+                }
+        ]
+}
+
+==============================
+one to many reference
+===================
+> use cityData
+switched to db cityData
+> db.cities.insertOne({name: "New York City", coordinates: {lat: 21, lng: 55}})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d90b9a8ea5549345638f86f")
+}
+> db.cities.findOne()
+{
+        "_id" : ObjectId("5d90b9a8ea5549345638f86f"),
+        "name" : "New York City",
+        "coordinates" : {
+                "lat" : 21,
+                "lng" : 55
+        }
+}
+> db.citizens.insertMany([{name: "Max Schwarzmueller", cityId: ObjectId("5d90b9a8ea5549345638f86f")}, {name: "Manuel Lorenz", cityId: ObjectId("5d90b9a8ea5549345638f86f")}])
+{
+        "acknowledged" : true,
+        "insertedIds" : [
+                ObjectId("5d90b9f8ea5549345638f870"),
+                ObjectId("5d90b9f8ea5549345638f871")
+        ]
+}
+> db.citizens.find().pretty()
+{
+        "_id" : ObjectId("5d90b9f8ea5549345638f870"),
+        "name" : "Max Schwarzmueller",
+        "cityId" : ObjectId("5d90b9a8ea5549345638f86f")
+}
+{
+        "_id" : ObjectId("5d90b9f8ea5549345638f871"),
+        "name" : "Manuel Lorenz",
+        "cityId" : ObjectId("5d90b9a8ea5549345638f86f")
+}
+
+================
+many to many embedded
+=======================
+use shop
+switched to db shop
+> db.products.insertOne({title: "A Book", price: 12.99})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d90be75ea5549345638f872")
+}
+> db.customers.insertOne({name: "Max", age: 29})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d90be8cea5549345638f873")
+}
+> db.orders.insertOne({productId: ObjectId("5d90be75ea5549345638f872"), customerId: ObjectId("5d90be8cea5549345638f873")})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d90bebdea5549345638f874")
+}
+
+> db.orders.drop()
+true
+
+
+> db.products.find()
+{ "_id" : ObjectId("5d90be75ea5549345638f872"), "title" : "A Book", "price" : 12.99 }
+> db.customers.find()
+{ "_id" : ObjectId("5d90be8cea5549345638f873"), "name" : "Max", "age" : 29 }
+> db.customers.updateOne({}, {$set: {orders: [{productId: ObjectId("5d90be75ea5549345638f872"), quantity: 2}]}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.customers.findOne()
+{
+        "_id" : ObjectId("5d90be8cea5549345638f873"),
+        "name" : "Max",
+        "age" : 29,
+        "orders" : [
+                {
+                        "productId" : ObjectId("5d90be75ea5549345638f872"),
+                        "quantity" : 2
+                }
+        ]
+}
+>
+
+
+> db.customers.updateOne({}, {$set: {orders: [{title: "A Book", price: 12.99, quantity: 2}]}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.customers.findOne()
+{
+        "_id" : ObjectId("5d90be8cea5549345638f873"),
+        "name" : "Max",
+        "age" : 29,
+        "orders" : [
+                {
+                        "title" : "A Book",
+                        "price" : 12.99,
+                        "quantity" : 2
+                }
+        ]
+}
+
+many to many references
+======================
+> use bookRegistry
+switched to db bookRegistry
+> db.books.insertOne({name: "My favorite book", authors: [{name: "Max Schwarz", age: 29}, {name: "Manuel Lor", age: 30}]})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d90c31fea5549345638f875")
+}
+> db.books.find().pretty()
+{
+        "_id" : ObjectId("5d90c31fea5549345638f875"),
+        "name" : "My favorite book",
+        "authors" : [
+                {
+                        "name" : "Max Schwarz",
+                        "age" : 29
+                },
+                {
+                        "name" : "Manuel Lor",
+                        "age" : 30
+                }
+        ]
+}
+
+
+> use bookRegistry
+switched to db bookRegistry
+> db.books.insertOne({name: "My favorite book", authors: [{name: "Max Schwarz", age: 29}, {name: "Manuel Lor", age: 30}]})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d90c31fea5549345638f875")
+}
+> db.books.find().pretty()
+{
+        "_id" : ObjectId("5d90c31fea5549345638f875"),
+        "name" : "My favorite book",
+        "authors" : [
+                {
+                        "name" : "Max Schwarz",
+                        "age" : 29
+                },
+                {
+                        "name" : "Manuel Lor",
+                        "age" : 30
+                }
+        ]
+}
+> db.authors.insertMany([{name: "Max Schwarz", age: 29, address: {street: "Main"}}, {name: "Manuel Lor", age: 30, address: {street: "Tree"}}])
+{
+        "acknowledged" : true,
+        "insertedIds" : [
+                ObjectId("5d90c3e2ea5549345638f876"),
+                ObjectId("5d90c3e2ea5549345638f877")
+        ]
+}
+> db.books.updateOne({}, {$set: {authors: [ObjectId("5d90c3e2ea5549345638f876"), ObjectId("5d90c3e2ea5549345638f877")]}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+> db.books.findOne()
+{
+        "_id" : ObjectId("5d90c31fea5549345638f875"),
+        "name" : "My favorite book",
+        "authors" : [
+                ObjectId("5d90c3e2ea5549345638f876"),
+                ObjectId("5d90c3e2ea5549345638f877")
+        ]
+}
+
+=============================
+Using "lookUp()" for Merging Reference
+==================================
+> db.books.find().pretty()
+{
+        "_id" : ObjectId("5d90c31fea5549345638f875"),
+        "name" : "My favorite book",
+        "authors" : [
+                ObjectId("5d90c3e2ea5549345638f876"),
+                ObjectId("5d90c3e2ea5549345638f877")
+        ]
+}
+> db.books.aggregate([{$lookup: {from: "authors", localField: "authors", foreignField: "_id", as: "creators"}}]).pretty()
+{
+        "_id" : ObjectId("5d90c31fea5549345638f875"),
+        "name" : "My favorite book",
+        "authors" : [
+                ObjectId("5d90c3e2ea5549345638f876"),
+                ObjectId("5d90c3e2ea5549345638f877")
+        ],
+        "creators" : [
+                {
+                        "_id" : ObjectId("5d90c3e2ea5549345638f876"),
+                        "name" : "Max Schwarz",
+                        "age" : 29,
+                        "address" : {
+                                "street" : "Main"
+                        }
+                },
+                {
+                        "_id" : ObjectId("5d90c3e2ea5549345638f877"),
+                        "name" : "Manuel Lor",
+                        "age" : 30,
+                        "address" : {
+                                "street" : "Tree"
+                        }
+                }
+        ]
+}
+
+===========
+Example Blog project
+===================
+> use blog
+switched to db blog
+> db.users.insertMany([{name: "Max Schwarzmueller", age: 29, email: "max@test.com"}, {name: "Manuel Lorenz", age: 30, email: "manu@test.com"}])
+{
+        "acknowledged" : true,
+        "insertedIds" : [
+                ObjectId("5d90cccbea5549345638f878"),
+                ObjectId("5d90cccbea5549345638f879")
+        ]
+}
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d90cccbea5549345638f878"),
+        "name" : "Max Schwarzmueller",
+        "age" : 29,
+        "email" : "max@test.com"
+}
+{
+        "_id" : ObjectId("5d90cccbea5549345638f879"),
+        "name" : "Manuel Lorenz",
+        "age" : 30,
+        "email" : "manu@test.com"
+}
+> db.posts.insertOne({title: "My first Post!", text: "This is my first post, I hope you like it!", tags: ["new", "tech"], creator: ObjectId("5d90cccbea5549345638f878"), comments: [{text: "I like this post!", author: ObjectId("5d90cccbea5549345638f879")}]})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d90cdfdea5549345638f87a")
+}
+> db.posts.findOne()
+{
+        "_id" : ObjectId("5d90cdfdea5549345638f87a"),
+        "title" : "My first Post!",
+        "text" : "This is my first post, I hope you like it!",
+        "tags" : [
+                "new",
+                "tech"
+        ],
+        "creator" : ObjectId("5d90cccbea5549345638f878"),
+        "comments" : [
+                {
+                        "text" : "I like this post!",
+                        "author" : ObjectId("5d90cccbea5549345638f879")
+                }
+        ]
+}
+
+=================
+Schema Validation
+======================
+> db.posts.drop()
+true
+> db.createCollection('posts', {
+...   validator: {
+...     $jsonSchema: {
+...       bsonType: 'object',
+...       required: ['title', 'text', 'creator', 'comments'],
+...       properties: {
+...         title: {
+...           bsonType: 'string',
+...           description: 'must be a string and is required'
+...         },
+...         text: {
+...           bsonType: 'string',
+...           description: 'must be a string and is required'
+...         },
+...         creator: {
+...           bsonType: 'objectId',
+...           description: 'must be an objectid and is required'
+...         },
+...         comments: {
+...           bsonType: 'array',
+...           description: 'must be an array and is required',
+...           items: {
+...             bsonType: 'object',
+...             required: ['text', 'author'],
+...             properties: {
+...               text: {
+...                 bsonType: 'string',
+...                 description: 'must be a string and is required'
+...               },
+...               author: {
+...                 bsonType: 'objectId',
+...                 description: 'must be an objectid and is required'
+...               }
+...             }
+...           }
+...         }
+...       }
+...     }
+...   }
+... })
+{ "ok" : 1 }
+> db.posts.insertOne({title: "My first Post!", text: "This is my first post, I hope you like it!", tags: ["new", "tech"], creator: ObjectId("5d90cccbea5549345638f878"), comments: [{text: "I like this post!", author: ObjectId("5d90cccbea5549345638f879")}]})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d90d29eea5549345638f87b")
+}
+
+
+=========================
+Changing the Validation Action
+==========================
+> db.runCommand({
+...   collMod: 'posts',
+...   validator: {
+...     $jsonSchema: {
+...       bsonType: 'object',
+...       required: ['title', 'text', 'creator', 'comments'],
+...       properties: {
+...         title: {
+...           bsonType: 'string',
+...           description: 'must be a string and is required'
+...         },
+...         text: {
+...           bsonType: 'string',
+...           description: 'must be a string and is required'
+...         },
+...         creator: {
+...           bsonType: 'objectId',
+...           description: 'must be an objectid and is required'
+...         },
+...         comments: {
+...           bsonType: 'array',
+...           description: 'must be an array and is required',
+...           items: {
+...             bsonType: 'object',
+...             required: ['text', 'author'],
+...             properties: {
+...               text: {
+...                 bsonType: 'string',
+...                 description: 'must be a string and is required'
+...               },
+...               author: {
+...                 bsonType: 'objectId',
+...                 description: 'must be an objectid and is required'
+...               }
+...             }
+...           }
+...         }
+...       }
+...     }
+...   },
+...   validationAction: 'warn'
+... });
+{ "ok" : 1 }
+> db.posts.insertOne({title: "My first Post!", text: "This is my first post, I hope you like it!", tags: ["new", "tech"], creator: ObjectId("5d90cccbea5549345638f878"), comments: [{text: "I like this post!", author: 12}]})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d90d4f0ea5549345638f87c")
+}
+

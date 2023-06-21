@@ -1,0 +1,154 @@
+dbPath: C:\Program Files\MongoDB\Server\4.2\data
+
+net stop MongoDB
+net start MongoDB
+
+C:\Program Files\MongoDB\Server\4.2\bin
+
+
+******************************************
+*******   Leafar · 8 days ago
+******* SOLVED, I update mongo to the latest version 4.2 and I have to configure authorization in /etc/mongod.conf
+*******
+security:        
+     authorization: enabled
+******************************************
+
+
+
+    security:        
+     authorization: enabled
+
+=============
+Creating a User
+=============
+mongod --dbpath D:\mongo-data\dbs --auth (on 1st cmd)
+(on 2nd cmd)
+-------------------
+> use admin
+switched to db admin
+> db.createUser({user: "max", pwd: "max", roles: ["userAdminAnyDatabase"]})
+Successfully added user: { "user" : "max", "roles" : [ "userAdminAnyDatabase" ] }
+
+
+> use admin
+switched to db admin
+> db.auth('max', 'max')
+1
+> show dbs
+admin               0.000GB
+analytics           0.003GB
+awesomeplaces       0.000GB
+boxOffice           0.000GB
+boxoffice-extended  0.000GB
+companyData         0.000GB
+config              0.000GB
+contactData         0.000GB
+credit              0.036GB
+financialData       0.000GB
+geoAsgDB            0.000GB
+local               0.000GB
+movieData           0.000GB
+user
+
+
+===============================
+Assigning Roles to Users & Databases
+===============================
+alternate way to login
+-------------------------------
+mongo -u max -p max --authenticationDatabase admin
+
+
+> use shop
+switched to db shop
+> db.createUser({user: 'appdev', pwd: 'dev', roles: ["readWrite"]})
+Successfully added user: { "user" : "appdev", "roles" : [ "readWrite" ] }
+> db.auth('appdev', 'dev')
+1
+
+
+> db.logout()
+{ "ok" : 1 }
+> ^C
+bye
+
+
+C:\>mongo -u appdev -p dev --authenticationDatabase shop
+
+
+> use shop
+switched to db shop
+
+
+> db.products.insertOne({name: "A Book"})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d99f99c458deeb12bd7736e")
+}
+
+
+========================================
+Updating & Extending Roles to Other Databases
+========================================
+> db.logout()
+{ "ok" : 1 }
+
+
+> use admin
+switched to db admin
+> db.auth('max', 'max')
+1
+
+
+> use shop
+switched to db shop
+
+
+> db.updateUser("appdev", {roles: ["readWrite", {role: "readWrite", db: "blog"}]})
+> db.getUser("appdev")
+{
+        "_id" : "shop.appdev",
+        "userId" : UUID("5393b487-38c3-46a6-889c-2690bb6bbc29"),
+        "user" : "appdev",
+        "db" : "shop",
+        "roles" : [
+                {
+                        "role" : "readWrite",
+                        "db" : "shop"
+                },
+                {
+                        "role" : "readWrite",
+                        "db" : "blog"
+                }
+        ],
+        "mechanisms" : [
+                "SCRAM-SHA-1",
+                "SCRAM-SHA-256"
+        ]
+}
+
+
+> db.logout()
+{ "ok" : 1 }
+> use shop
+switched to db shop
+> ^C
+bye
+
+
+C:\>mongo -u appdev -p dev --authenticationDatabase shop
+
+
+> use blog
+switched to db blog
+> db.posts.insertOne({title: "This works!"})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d99fe6baa924a188c7ad2ee")
+}
+
+
+============================
+Adding SSL Transport Encryption
+============================

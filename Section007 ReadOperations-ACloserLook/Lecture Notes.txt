@@ -1,0 +1,826 @@
+====================
+Understanding Evaluation Operators - "$expr"
+======================================
+> use financialData
+switched to db financialData
+> db.sales.insertMany([{volume: 100, target: 120}, {volume: 89, target: 80}, {volume: 200, target: 177}])
+{
+        "acknowledged" : true,
+        "insertedIds" : [
+                ObjectId("5d9465a23f7234b6a1bd41a3"),
+                ObjectId("5d9465a23f7234b6a1bd41a4"),
+                ObjectId("5d9465a23f7234b6a1bd41a5")
+        ]
+}
+> db.sales.find().pretty()
+{
+        "_id" : ObjectId("5d9465a23f7234b6a1bd41a3"),
+        "volume" : 100,
+        "target" : 120
+}
+{
+        "_id" : ObjectId("5d9465a23f7234b6a1bd41a4"),
+        "volume" : 89,
+        "target" : 80
+}
+{
+        "_id" : ObjectId("5d9465a23f7234b6a1bd41a5"),
+        "volume" : 200,
+        "target" : 177
+}
+> db.sales.find({$expr: {$gt: ["volume", "target"]}}).pretty()
+{
+        "_id" : ObjectId("5d9465a23f7234b6a1bd41a3"),
+        "volume" : 100,
+        "target" : 120
+}
+{
+        "_id" : ObjectId("5d9465a23f7234b6a1bd41a4"),
+        "volume" : 89,
+        "target" : 80
+}
+{
+        "_id" : ObjectId("5d9465a23f7234b6a1bd41a5"),
+        "volume" : 200,
+        "target" : 177
+}
+> db.sales.find({$expr: {$gt: ["$volume", "$target"]}}).pretty()
+{
+        "_id" : ObjectId("5d9465a23f7234b6a1bd41a4"),
+        "volume" : 89,
+        "target" : 80
+}
+{
+        "_id" : ObjectId("5d9465a23f7234b6a1bd41a5"),
+        "volume" : 200,
+        "target" : 177
+}
+
+
+> db.sales.find({$expr: {$gt: [{$cond: {if: {$gte: ["$volume", 190]}, then: {$subtract: ["$volume", 10]}, else: "$volume"}}, "$target"]}}).pretty()
+{
+        "_id" : ObjectId("5d9465a23f7234b6a1bd41a4"),
+        "volume" : 89,
+        "target" : 80
+}
+{
+        "_id" : ObjectId("5d9465a23f7234b6a1bd41a5"),
+        "volume" : 200,
+        "target" : 177
+}
+> db.sales.find({$expr: {$gt: [{$cond: {if: {$gte: ["$volume", 190]}, then: {$subtract: ["$volume", 30]}, else: "$volume"}}, "$target"]}}).pretty()
+{
+        "_id" : ObjectId("5d9465a23f7234b6a1bd41a4"),
+        "volume" : 89,
+        "target" : 80
+}
+
+==============
+Diving Deeper Into Querying Arrays
+==============================
+> db.users.findOne()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "phone" : 131782734
+}
+> db.users.find({"hobbies.title": "Sports"}).pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "phone" : 131782734
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "phone" : "80811987291",
+        "age" : null
+}
+
+=====================
+Using Array Query Selectors - "$size"
+===============================
+> db.users.insertOne({name: "Chris", hobbies: ["Sports", "Cooking", "Hiking"]})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d9472cf544b6a7f51134ffe")
+}
+> db.users.find().pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "phone" : 131782734
+}
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d9"),
+        "name" : "Manuel",
+        "hobbies" : [
+                {
+                        "title" : "Cooking",
+                        "frequency" : 5
+                },
+                {
+                        "title" : "Cars",
+                        "frequency" : 2
+                }
+        ],
+        "phone" : "012177972",
+        "age" : 30
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "phone" : "80811987291",
+        "age" : null
+}
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                "Sports",
+                "Cooking",
+                "Hiking"
+        ]
+}
+> db.users.find({hobbies: {$size: 3}}).pretty()
+{
+        "_id" : ObjectId("5d9472cf544b6a7f51134ffe"),
+        "name" : "Chris",
+        "hobbies" : [
+                "Sports",
+                "Cooking",
+                "Hiking"
+        ]
+}
+
+
+===============
+Using Array Query Selectors - "$all"
+==============================
+> use boxOffice
+switched to db boxOffice
+> db.movieStarts.find().pretty()
+{
+        "_id" : ObjectId("5d946bfffe5eb0789163d85b"),
+        "title" : "Teach me if you can",
+        "meta" : {
+                "rating" : 8.5,
+                "aired" : 2014,
+                "runtime" : 90
+        },
+        "visitors" : 590378,
+        "expectedVisitors" : 500000,
+        "genre" : [
+                "action",
+                "thriller"
+        ]
+}
+{
+        "_id" : ObjectId("5d946bfffe5eb0789163d85c"),
+        "title" : "The Last Student Returns",
+        "meta" : {
+                "rating" : 9.5,
+                "aired" : 2018,
+                "runtime" : 100
+        },
+        "visitors" : 1300000,
+        "expectedVisitors" : 1550000,
+        "genre" : [
+                "thriller",
+                "drama",
+                "action"
+        ]
+}
+{
+        "_id" : ObjectId("5d946bfffe5eb0789163d85d"),
+        "title" : "Supercharged Teaching",
+        "meta" : {
+                "rating" : 9.3,
+                "aired" : 2016,
+                "runtime" : 60
+        },
+        "visitors" : 370000,
+        "expectedVisitors" : 1000000,
+        "genre" : [
+                "thriller",
+                "action"
+        ]
+}
+> db.movieStarts.find({genre: ["action", "thriller"]}).pretty()
+{
+        "_id" : ObjectId("5d946bfffe5eb0789163d85b"),
+        "title" : "Teach me if you can",
+        "meta" : {
+                "rating" : 8.5,
+                "aired" : 2014,
+                "runtime" : 90
+        },
+        "visitors" : 590378,
+        "expectedVisitors" : 500000,
+        "genre" : [
+                "action",
+                "thriller"
+        ]
+}
+> db.movieStarts.find({genre: {$all: ["action", "thriller"]}}).pretty()
+{
+        "_id" : ObjectId("5d946bfffe5eb0789163d85b"),
+        "title" : "Teach me if you can",
+        "meta" : {
+                "rating" : 8.5,
+                "aired" : 2014,
+                "runtime" : 90
+        },
+        "visitors" : 590378,
+        "expectedVisitors" : 500000,
+        "genre" : [
+                "action",
+                "thriller"
+        ]
+}
+{
+        "_id" : ObjectId("5d946bfffe5eb0789163d85c"),
+        "title" : "The Last Student Returns",
+        "meta" : {
+                "rating" : 9.5,
+                "aired" : 2018,
+                "runtime" : 100
+        },
+        "visitors" : 1300000,
+        "expectedVisitors" : 1550000,
+        "genre" : [
+                "thriller",
+                "drama",
+                "action"
+        ]
+}
+{
+        "_id" : ObjectId("5d946bfffe5eb0789163d85d"),
+        "title" : "Supercharged Teaching",
+        "meta" : {
+                "rating" : 9.3,
+                "aired" : 2016,
+                "runtime" : 60
+        },
+        "visitors" : 370000,
+        "expectedVisitors" : 1000000,
+        "genre" : [
+                "thriller",
+                "action"
+        ]
+}
+
+==============
+Using Array Query Selectors - "$elemMatch"
+======================================
+> db.users.find({$and: [{"hobbies.title": "Sports"}, {"hobbies.frequency": {$gte: 3}}]}).pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "phone" : 131782734
+}
+{
+        "_id" : ObjectId("5d93717a299d476e0c8a48da"),
+        "name" : "Anna",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 2
+                },
+                {
+                        "title" : "Yoga",
+                        "frequency" : 3
+                }
+        ],
+        "phone" : "80811987291",
+        "age" : null
+}
+
+
+> db.users.find({hobbies: {$elemMatch: {title: "Sports", frequency: {$gte: 3}}}}).pretty()
+{
+        "_id" : ObjectId("5d937089299d476e0c8a48d8"),
+        "name" : "Max",
+        "hobbies" : [
+                {
+                        "title" : "Sports",
+                        "frequency" : 3
+                },
+                {
+                        "title" : "Cooking",
+                        "frequency" : 6
+                }
+        ],
+        "phone" : 131782734
+}
+
+======================
+Applying Cursors
+======================
+> use movieData
+switched to db movieData
+> db.movies.find().count()
+240
+
+
+> db.movies.find().next()
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7be3"),
+        "id" : 3,
+        "url" : "http://www.tvmaze.com/shows/3/bitten",
+        "name" : "Bitten",
+        "type" : "Scripted",
+        "language" : "English",
+        "genres" : [
+                "Drama",
+                "Horror",
+                "Romance"
+        ],
+        "status" : "Ended",
+        "runtime" : 60,
+        "premiered" : "2014-01-11",
+        "officialSite" : "http://bitten.space.ca/",
+        "schedule" : {
+                "time" : "22:00",
+                "days" : [
+                        "Friday"
+                ]
+        },
+        "rating" : {
+                "average" : 7.6
+        },
+        "weight" : 75,
+        "network" : {
+                "id" : 7,
+                "name" : "Space",
+                "country" : {
+                        "name" : "Canada",
+                        "code" : "CA",
+                        "timezone" : "America/Halifax"
+                }
+        },
+        "webChannel" : null,
+        "externals" : {
+                "tvrage" : 34965,
+                "thetvdb" : 269550,
+                "imdb" : "tt2365946"
+        },
+        "image" : {
+                "medium" : "http://static.tvmaze.com/uploads/images/medium_portrait/0/15.jpg",
+                "original" : "http://static.tvmaze.com/uploads/images/original_untouched/0/15.jpg"
+        },
+        "summary" : "<p>Based on the critically acclaimed series of novels from Kelley Armstrong. Set in Toronto and upper New York State, <b>Bitten</b> follows the adventures of 28-year-old Elena Michaels, the world's only female werewolf. An orphan, Elena thought she finally found her \"happily ever after\" with her new love Clayton, until her life changed forever. With one small bite, the normal life she craved was taken away and she was left to survive life with the Pack.</p>",
+        "updated" : 1534079818,
+        "_links" : {
+                "self" : {
+                        "href" : "http://api.tvmaze.com/shows/3"
+                },
+                "previousepisode" : {
+                        "href" : "http://api.tvmaze.com/episodes/631862"
+                }
+        }
+}
+> db.movies.find().next()
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7be3"),
+        "id" : 3,
+        "url" : "http://www.tvmaze.com/shows/3/bitten",
+        "name" : "Bitten",
+        "type" : "Scripted",
+        "language" : "English",
+        "genres" : [
+                "Drama",
+                "Horror",
+                "Romance"
+        ],
+        "status" : "Ended",
+        "runtime" : 60,
+        "premiered" : "2014-01-11",
+        "officialSite" : "http://bitten.space.ca/",
+        "schedule" : {
+                "time" : "22:00",
+                "days" : [
+                        "Friday"
+                ]
+        },
+        "rating" : {
+                "average" : 7.6
+        },
+        "weight" : 75,
+        "network" : {
+                "id" : 7,
+                "name" : "Space",
+                "country" : {
+                        "name" : "Canada",
+                        "code" : "CA",
+                        "timezone" : "America/Halifax"
+                }
+        },
+        "webChannel" : null,
+        "externals" : {
+                "tvrage" : 34965,
+                "thetvdb" : 269550,
+                "imdb" : "tt2365946"
+        },
+        "image" : {
+                "medium" : "http://static.tvmaze.com/uploads/images/medium_portrait/0/15.jpg",
+                "original" : "http://static.tvmaze.com/uploads/images/original_untouched/0/15.jpg"
+        },
+        "summary" : "<p>Based on the critically acclaimed series of novels from Kelley Armstrong. Set in Toronto and upper New York State, <b>Bitten</b> follows the adventures of 28-year-old Elena Michaels, the world's only female werewolf. An orphan, Elena thought she finally found her \"happily ever after\" with her new love Clayton, until her life changed forever. With one small bite, the normal life she craved was taken away and she was left to survive life with the Pack.</p>",
+        "updated" : 1534079818,
+        "_links" : {
+                "self" : {
+                        "href" : "http://api.tvmaze.com/shows/3"
+                },
+                "previousepisode" : {
+                        "href" : "http://api.tvmaze.com/episodes/631862"
+                }
+        }
+}
+
+
+> const dataCursor = db.movies.find()
+> dataCursor.next()
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7be3"),
+        "id" : 3,
+        "url" : "http://www.tvmaze.com/shows/3/bitten",
+        "name" : "Bitten",
+        "type" : "Scripted",
+        "language" : "English",
+        "genres" : [
+                "Drama",
+                "Horror",
+                "Romance"
+        ],
+        "status" : "Ended",
+        "runtime" : 60,
+        "premiered" : "2014-01-11",
+        "officialSite" : "http://bitten.space.ca/",
+        "schedule" : {
+                "time" : "22:00",
+                "days" : [
+                        "Friday"
+                ]
+        },
+        "rating" : {
+                "average" : 7.6
+        },
+        "weight" : 75,
+        "network" : {
+                "id" : 7,
+                "name" : "Space",
+                "country" : {
+                        "name" : "Canada",
+                        "code" : "CA",
+                        "timezone" : "America/Halifax"
+                }
+        },
+        "webChannel" : null,
+        "externals" : {
+                "tvrage" : 34965,
+                "thetvdb" : 269550,
+                "imdb" : "tt2365946"
+        },
+        "image" : {
+                "medium" : "http://static.tvmaze.com/uploads/images/medium_portrait/0/15.jpg",
+                "original" : "http://static.tvmaze.com/uploads/images/original_untouched/0/15.jpg"
+        },
+        "summary" : "<p>Based on the critically acclaimed series of novels from Kelley Armstrong. Set in Toronto and upper New York State, <b>Bitten</b> follows the adventures of 28-year-old Elena Michaels, the world's only female werewolf. An orphan, Elena thought she finally found her \"happily ever after\" with her new love Clayton, until her life changed forever. With one small bite, the normal life she craved was taken away and she was left to survive life with the Pack.</p>",
+        "updated" : 1534079818,
+        "_links" : {
+                "self" : {
+                        "href" : "http://api.tvmaze.com/shows/3"
+                },
+                "previousepisode" : {
+                        "href" : "http://api.tvmaze.com/episodes/631862"
+                }
+        }
+}
+> dataCursor.next()
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7be4"),
+        "id" : 2,
+        "url" : "http://www.tvmaze.com/shows/2/person-of-interest",
+        "name" : "Person of Interest",
+        "type" : "Scripted",
+        "language" : "English",
+        "genres" : [
+                "Drama",
+                "Action",
+                "Crime"
+        ],
+        "status" : "Ended",
+        "runtime" : 60,
+        "premiered" : "2011-09-22",
+        "officialSite" : "http://www.cbs.com/shows/person_of_interest/",
+        "schedule" : {
+                "time" : "22:00",
+                "days" : [
+                        "Tuesday"
+                ]
+        },
+        "rating" : {
+                "average" : 9
+        },
+        "weight" : 96,
+        "network" : {
+                "id" : 2,
+                "name" : "CBS",
+                "country" : {
+                        "name" : "United States",
+                        "code" : "US",
+                        "timezone" : "America/New_York"
+                }
+        },
+        "webChannel" : null,
+        "externals" : {
+                "tvrage" : 28376,
+                "thetvdb" : 248742,
+                "imdb" : "tt1839578"
+        },
+        "image" : {
+                "medium" : "http://static.tvmaze.com/uploads/images/medium_portrait/163/407679.jpg",
+                "original" : "http://static.tvmaze.com/uploads/images/original_untouched/163/407679.jpg"
+        },
+        "summary" : "<p>You are being watched. The government has a secret system, a machine that spies on you every hour of every day. I know because I built it. I designed the Machine to detect acts of terror but it sees everything. Violent crimes involving ordinary people. People like you. Crimes the government considered \"irrelevant\". They wouldn't act so I decided I would. But I needed a partner. Someone with the skills to intervene. Hunted by the authorities, we work in secret. You'll never find us. But victim or perpetrator, if your number is up, we'll find you.</p>",
+        "updated" : 1535507028,
+        "_links" : {
+                "self" : {
+                        "href" : "http://api.tvmaze.com/shows/2"
+                },
+                "previousepisode" : {
+                        "href" : "http://api.tvmaze.com/episodes/659372"
+                }
+        }
+}
+
+
+dataCursor.forEach(doc => {printjson(doc)})
+
+
+> dataCursor.hasNext()
+true
+
+=============
+Sorting Cursor Results
+====================
+db.movies.find().sort({"rating.average": 1}).pretty()  >>> ascending
+db.movies.find().sort({"rating.average": -1}).pretty()  >>> decending
+db.movies.find().sort({"rating.average": 1, runtime: -1}).pretty()  >> average ascending, runtime decending
+
+============
+Skipping & Limiting Cursor Results
+================================
+db.movies.find().sort({"rating.average": 1, runtime: -1}).skip(100).limit(10).pretty() >> sort first, skipt second, and limit third (you can change order as you want)
+
+
+=============
+Using Projection to Shape our Results
+=================================
+db.movies.find({}, {name: 1, genres: 1, runtime: 1, rating: 1}).pretty()
+db.movies.find({}, {name: 1, genres: 1, runtime: 1, "rating.average": 1, "schedule.time": 1, _id: 0}).pretty()
+
+
+==============
+Using Projection in Arrays
+======================
+> db.movies.find({genres: "Drama"}, {"genres.$": 1}).pretty()
+{ "_id" : ObjectId("5d935ddb2674794efd3d7be3"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7be4"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7be5"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7be6"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7be7"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7be9"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bea"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7beb"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bec"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bee"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bef"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf0"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf1"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf2"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf3"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf4"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf5"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf7"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf8"), "genres" : [ "Drama" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf9"), "genres" : [ "Drama" ] }
+
+
+> db.movies.find({genres: "Drama"}, {genres: {$elemMatch: {$eq: "Horror"}}}).pretty()
+{ "_id" : ObjectId("5d935ddb2674794efd3d7be3"), "genres" : [ "Horror" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7be4") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7be5") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7be6") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7be7") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7be9") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bea"), "genres" : [ "Horror" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7beb") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bec") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bee"), "genres" : [ "Horror" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bef"), "genres" : [ "Horror" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf0") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf1") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf2") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf3"), "genres" : [ "Horror" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf4") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf5") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf7") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf8") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bf9") }
+Type "it" for more
+>
+
+
+> db.movies.find({"rating.average": {$gt: 9}}, {genres: {$elemMatch: {$eq: "Horror"}}}).pretty()
+{ "_id" : ObjectId("5d935ddb2674794efd3d7bfd"), "genres" : [ "Horror" ] }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7c32") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7c83") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7c8b") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7c94") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7ca5") }
+{ "_id" : ObjectId("5d935ddb2674794efd3d7caf") }
+
+
+===============
+Understanding "$slice"
+====================
+> db.movies.find({"rating.average": {$gt: 9}}, {genres: {$slice: 2}, name: 1}).pretty()      >> only first 2 items of genres array
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7bfd"),
+        "name" : "Berserk",
+        "genres" : [
+                "Anime",
+                "Fantasy"
+        ]
+}
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7c32"),
+        "name" : "Game of Thrones",
+        "genres" : [
+                "Drama",
+                "Adventure"
+        ]
+}
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7c83"),
+        "name" : "Breaking Bad",
+        "genres" : [
+                "Drama",
+                "Crime"
+        ]
+}
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7c8b"),
+        "name" : "Firefly",
+        "genres" : [
+                "Adventure",
+                "Science-Fiction"
+        ]
+}
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7c94"),
+        "name" : "The Wire",
+        "genres" : [
+                "Drama",
+                "Crime"
+        ]
+}
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7ca5"),
+        "name" : "Stargate SG-1",
+        "genres" : [
+                "Action",
+                "Adventure"
+        ]
+}
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7caf"),
+        "name" : "Rick and Morty",
+        "genres" : [
+                "Comedy",
+                "Adventure"
+        ]
+}
+>
+
+
+> db.movies.find({"rating.average": {$gt: 9}}, {genres: {$slice: [1, 2]}, name: 1}).pretty()      >> skip first item of genres array, show 2nd and 3rd item of genres array
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7bfd"),
+        "name" : "Berserk",
+        "genres" : [
+                "Fantasy",
+                "Horror"
+        ]
+}
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7c32"),
+        "name" : "Game of Thrones",
+        "genres" : [
+                "Adventure",
+                "Fantasy"
+        ]
+}
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7c83"),
+        "name" : "Breaking Bad",
+        "genres" : [
+                "Crime",
+                "Thriller"
+        ]
+}
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7c8b"),
+        "name" : "Firefly",
+        "genres" : [
+                "Science-Fiction",
+                "Western"
+        ]
+}
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7c94"),
+        "name" : "The Wire",
+        "genres" : [
+                "Crime"
+        ]
+}
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7ca5"),
+        "name" : "Stargate SG-1",
+        "genres" : [
+                "Adventure",
+                "Science-Fiction"
+        ]
+}
+{
+        "_id" : ObjectId("5d935ddb2674794efd3d7caf"),
+        "name" : "Rick and Morty",
+        "genres" : [
+                "Adventure",
+                "Science-Fiction"
+        ]
+}
+
+

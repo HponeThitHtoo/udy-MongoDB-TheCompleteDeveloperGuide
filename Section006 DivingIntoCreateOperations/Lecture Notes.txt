@@ -1,0 +1,330 @@
+understanding insert() methods
+============================
+> use contactData
+switched to db contactData
+> db.persons.insertOne({name: "Max", age: 30, hobbies: ["Sports", "Cooking"]})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d93113cb5d3277d69a7ab53")
+}
+> db.persons.insertOne({name: "Manuel", age: 31, hobbies: ["Cars", "Cooking"]})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d931158b5d3277d69a7ab54")
+}
+> db.persons.insertMany([{name: "Anna", age: 29, hobbies: ["Sports", "Yoga"]}])
+{
+        "acknowledged" : true,
+        "insertedIds" : [
+                ObjectId("5d93128ab5d3277d69a7ab55")
+        ]
+}
+> db.persons.insertMany([{name: "Maria", age: 31}, {name: "Chris", age: 25}])
+{
+        "acknowledged" : true,
+        "insertedIds" : [
+                ObjectId("5d9312a7b5d3277d69a7ab56"),
+                ObjectId("5d9312a7b5d3277d69a7ab57")
+        ]
+}
+> db.persons.insert({name: "Phil", age: 35})
+WriteResult({ "nInserted" : 1 })
+> db.persons.insert([{name: "Sandeep", age: 28}, {name: "Hans", age: 38}])
+BulkWriteResult({
+        "writeErrors" : [ ],
+        "writeConcernErrors" : [ ],
+        "nInserted" : 2,
+        "nUpserted" : 0,
+        "nMatched" : 0,
+        "nModified" : 0,
+        "nRemoved" : 0,
+        "upserted" : [ ]
+})
+
+===============
+Working with Ordered Inserts
+=========================
+> db.hoobies.insertMany([{_id: "sports", name: "Sports"}, {_id: "cooking", name: "Cooking"}, {_id: "cars", name: "Cars"}])
+{
+        "acknowledged" : true,
+        "insertedIds" : [
+                "sports",
+                "cooking",
+                "cars"
+        ]
+}
+> db.hoobies.insertMany([{_id: "yoga", name: "Yoga"}, {_id: "cooking", name: "Cooking"}, {_id: "hiking", name: "Hiking"}])
+2019-10-01T16:13:36.440+0630 E  QUERY    [js] uncaught exception: BulkWriteError({
+        "writeErrors" : [
+                {
+                        "index" : 1,
+                        "code" : 11000,
+                        "errmsg" : "E11000 duplicate key error collection: contactData.hoobies index: _id_ dup key: { _id: \"cooking\" }",
+                        "op" : {
+                                "_id" : "cooking",
+                                "name" : "Cooking"
+                        }
+                }
+        ],
+        "writeConcernErrors" : [ ],
+        "nInserted" : 1,
+        "nUpserted" : 0,
+        "nMatched" : 0,
+        "nModified" : 0,
+        "nRemoved" : 0,
+        "upserted" : [ ]
+}) :
+BulkWriteError({
+        "writeErrors" : [
+                {
+                        "index" : 1,
+                        "code" : 11000,
+                        "errmsg" : "E11000 duplicate key error collection: contactData.hoobies index: _id_ dup key: { _id: \"cooking\" }",
+                        "op" : {
+                                "_id" : "cooking",
+                                "name" : "Cooking"
+                        }
+                }
+        ],
+        "writeConcernErrors" : [ ],
+        "nInserted" : 1,
+        "nUpserted" : 0,
+        "nMatched" : 0,
+        "nModified" : 0,
+        "nRemoved" : 0,
+        "upserted" : [ ]
+})
+BulkWriteError@src/mongo/shell/bulk_api.js:367:48
+BulkWriteResult/this.toError@src/mongo/shell/bulk_api.js:332:24
+Bulk/this.execute@src/mongo/shell/bulk_api.js:1186:23
+DBCollection.prototype.insertMany@src/mongo/shell/crud_api.js:314:5
+@(shell):1:1
+
+> db.hoobies.find().pretty()
+{ "_id" : "sports", "name" : "Sports" }
+{ "_id" : "cooking", "name" : "Cooking" }
+{ "_id" : "cars", "name" : "Cars" }
+{ "_id" : "yoga", "name" : "Yoga" }
+
+> db.hoobies.insertMany([{_id: "yoga", name: "Yoga"}, {_id: "cooking", name: "Cooking"}, {_id: "hiking", name: "Hiking"}], {ordered: false})
+2019-10-01T16:18:56.669+0630 E  QUERY    [js] uncaught exception: BulkWriteError({
+        "writeErrors" : [
+                {
+                        "index" : 0,
+                        "code" : 11000,
+                        "errmsg" : "E11000 duplicate key error collection: contactData.hoobies index: _id_ dup key: { _id: \"yoga\" }",
+                        "op" : {
+                                "_id" : "yoga",
+                                "name" : "Yoga"
+                        }
+                },
+                {
+                        "index" : 1,
+                        "code" : 11000,
+                        "errmsg" : "E11000 duplicate key error collection: contactData.hoobies index: _id_ dup key: { _id: \"cooking\" }",
+                        "op" : {
+                                "_id" : "cooking",
+                                "name" : "Cooking"
+                        }
+                }
+        ],
+        "writeConcernErrors" : [ ],
+        "nInserted" : 1,
+        "nUpserted" : 0,
+        "nMatched" : 0,
+        "nModified" : 0,
+        "nRemoved" : 0,
+        "upserted" : [ ]
+}) :
+BulkWriteError({
+        "writeErrors" : [
+                {
+                        "index" : 0,
+                        "code" : 11000,
+                        "errmsg" : "E11000 duplicate key error collection: contactData.hoobies index: _id_ dup key: { _id: \"yoga\" }",
+                        "op" : {
+                                "_id" : "yoga",
+                                "name" : "Yoga"
+                        }
+                },
+                {
+                        "index" : 1,
+                        "code" : 11000,
+                        "errmsg" : "E11000 duplicate key error collection: contactData.hoobies index: _id_ dup key: { _id: \"cooking\" }",
+                        "op" : {
+                                "_id" : "cooking",
+                                "name" : "Cooking"
+                        }
+                }
+        ],
+        "writeConcernErrors" : [ ],
+        "nInserted" : 1,
+        "nUpserted" : 0,
+        "nMatched" : 0,
+        "nModified" : 0,
+        "nRemoved" : 0,
+        "upserted" : [ ]
+})
+BulkWriteError@src/mongo/shell/bulk_api.js:367:48
+BulkWriteResult/this.toError@src/mongo/shell/bulk_api.js:332:24
+Bulk/this.execute@src/mongo/shell/bulk_api.js:1186:23
+DBCollection.prototype.insertMany@src/mongo/shell/crud_api.js:314:5
+@(shell):1:1
+> db.hoobies.find().pretty()
+{ "_id" : "sports", "name" : "Sports" }
+{ "_id" : "cooking", "name" : "Cooking" }
+{ "_id" : "cars", "name" : "Cars" }
+{ "_id" : "yoga", "name" : "Yoga" }
+{ "_id" : "hiking", "name" : "Hiking" }
+
+===========
+Understanding the "writeConcern"
+=============================
+> db.persons.find().pretty()
+{
+        "_id" : ObjectId("5d93113cb5d3277d69a7ab53"),
+        "name" : "Max",
+        "age" : 30,
+        "hobbies" : [
+                "Sports",
+                "Cooking"
+        ]
+}
+{
+        "_id" : ObjectId("5d931158b5d3277d69a7ab54"),
+        "name" : "Manuel",
+        "age" : 31,
+        "hobbies" : [
+                "Cars",
+                "Cooking"
+        ]
+}
+{
+        "_id" : ObjectId("5d93128ab5d3277d69a7ab55"),
+        "name" : "Anna",
+        "age" : 29,
+        "hobbies" : [
+                "Sports",
+                "Yoga"
+        ]
+}
+{
+        "_id" : ObjectId("5d9312a7b5d3277d69a7ab56"),
+        "name" : "Maria",
+        "age" : 31
+}
+{
+        "_id" : ObjectId("5d9312a7b5d3277d69a7ab57"),
+        "name" : "Chris",
+        "age" : 25
+}
+{
+        "_id" : ObjectId("5d9312ffb5d3277d69a7ab58"),
+        "name" : "Phil",
+        "age" : 35
+}
+{
+        "_id" : ObjectId("5d931372b5d3277d69a7ab59"),
+        "name" : "Sandeep",
+        "age" : 28
+}
+{
+        "_id" : ObjectId("5d931372b5d3277d69a7ab5a"),
+        "name" : "Hans",
+        "age" : 38
+}
+> db.persons.insertOne({name: "Chrissy", age: 41}, {writeConcern: {w: 0}})
+{ "acknowledged" : false }
+> db.persons.find().pretty()
+{
+        "_id" : ObjectId("5d93113cb5d3277d69a7ab53"),
+        "name" : "Max",
+        "age" : 30,
+        "hobbies" : [
+                "Sports",
+                "Cooking"
+        ]
+}
+{
+        "_id" : ObjectId("5d931158b5d3277d69a7ab54"),
+        "name" : "Manuel",
+        "age" : 31,
+        "hobbies" : [
+                "Cars",
+                "Cooking"
+        ]
+}
+{
+        "_id" : ObjectId("5d93128ab5d3277d69a7ab55"),
+        "name" : "Anna",
+        "age" : 29,
+        "hobbies" : [
+                "Sports",
+                "Yoga"
+        ]
+}
+{
+        "_id" : ObjectId("5d9312a7b5d3277d69a7ab56"),
+        "name" : "Maria",
+        "age" : 31
+}
+{
+        "_id" : ObjectId("5d9312a7b5d3277d69a7ab57"),
+        "name" : "Chris",
+        "age" : 25
+}
+{
+        "_id" : ObjectId("5d9312ffb5d3277d69a7ab58"),
+        "name" : "Phil",
+        "age" : 35
+}
+{
+        "_id" : ObjectId("5d931372b5d3277d69a7ab59"),
+        "name" : "Sandeep",
+        "age" : 28
+}
+{
+        "_id" : ObjectId("5d931372b5d3277d69a7ab5a"),
+        "name" : "Hans",
+        "age" : 38
+}
+{
+        "_id" : ObjectId("5d93256db5d3277d69a7ab5b"),
+        "name" : "Chrissy",
+        "age" : 41
+}
+
+> db.persons.insertOne({name: "Alex", age: 36}, {writeConcern: {w: 1}}) (default option)
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d9325b8b5d3277d69a7ab5c")
+}
+> db.persons.insertOne({name: "Michael", age: 51}, {writeConcern: {w: 1, j: false}})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d9326cdb5d3277d69a7ab5d")
+}
+> db.persons.insertOne({name: "Michaela", age: 51}, {writeConcern: {w: 1, j: true}})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d9326deb5d3277d69a7ab5e")
+}
+> db.persons.insertOne({name: "Aliya", age: 22}, {writeConcern: {w: 1, j: true, wtimeout: 200}})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d9326f3b5d3277d69a7ab5f")
+}
+> db.persons.insertOne({name: "Aliya", age: 22}, {writeConcern: {w: 1, j: true, wtimeout: 1}})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d9326fdb5d3277d69a7ab60")
+}
+
+==============
+What is "Atomicity"?
+=================
+
+==============
+Importing Data
+==============
+cd to folder path inwhich the file to import is exists and then type this command >>>  mongoimport tv-shows.json -d movieData -c movies --jsonArray --drop

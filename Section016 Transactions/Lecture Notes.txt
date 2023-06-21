@@ -1,0 +1,25 @@
+====================
+What are Transactions?
+====================
+On MongoDBAtlas
+--------------------------
+
+
+
+==========================
+How Does a Transaction Work?
+==========================
+On MongoDBAtlas
+--------------------------
+const session = db.getMongo().startSession()
+const postsColl = session.getDatabase("blog").posts
+const usersColl = session.getDatabase("blog").users
+session.startTransaction()
+usersColl.deleteOne({_id: ObjectId("5ba0adfacfd31f948ed7ea10")})
+> { "acknowledged": true, "deleteCount": 1 }
+posts.Coll.deleteMany({userId: ObjectId("5ba0adfacfd31f948ed7ea10")})
+> { "acknowledged": true, "deleteCount": 2 }
+session.commitTransaction()
+db.users.find().pretty()
+
+

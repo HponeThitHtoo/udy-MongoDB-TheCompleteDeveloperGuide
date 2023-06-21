@@ -1,0 +1,63 @@
+=============================
+Understanding Capped Collections
+=============================
+Capped collections are a special type of collection which you have to create explicitly where you limit the amount of data
+or documents that can be stored in there and old documents will simply be deleted when well this size is exceeded,
+so it's basically a store where oldest data is automatically deleted when new data comes in.
+This can be efficient for high throughput application logs where you only need the most recent logs
+or as a caching service where you cache some data and if the data then was deleted because it
+hasn't been used in a while, well then you're fine with that and you can just re-add it.
+
+
+> use performance
+switched to db performance
+> db.createCollection("capped", {capped: true, size: 10000, max: 3})
+{ "ok" : 1 }
+> db.capped.insertOne({name: "Max"})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d9aef12ad3d78d8ca676e14")
+}
+> db.capped.insertOne({name: "Manu"})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d9aef18ad3d78d8ca676e15")
+}
+> db.capped.insertOne({name: "Anna"})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d9aef1ead3d78d8ca676e16")
+}
+
+
+> db.capped.find().pretty()
+{ "_id" : ObjectId("5d9aef12ad3d78d8ca676e14"), "name" : "Max" }
+{ "_id" : ObjectId("5d9aef18ad3d78d8ca676e15"), "name" : "Manu" }
+{ "_id" : ObjectId("5d9aef1ead3d78d8ca676e16"), "name" : "Anna" }
+> db.capped.find().sort({$natural: -1}).pretty()
+{ "_id" : ObjectId("5d9aef1ead3d78d8ca676e16"), "name" : "Anna" }
+{ "_id" : ObjectId("5d9aef18ad3d78d8ca676e15"), "name" : "Manu" }
+{ "_id" : ObjectId("5d9aef12ad3d78d8ca676e14"), "name" : "Max" }
+
+
+> db.capped.insertOne({name: "Maria"})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5d9af095ad3d78d8ca676e17")
+}
+> db.capped.find().pretty()
+{ "_id" : ObjectId("5d9aef18ad3d78d8ca676e15"), "name" : "Manu" }
+{ "_id" : ObjectId("5d9aef1ead3d78d8ca676e16"), "name" : "Anna" }
+{ "_id" : ObjectId("5d9af095ad3d78d8ca676e17"), "name" : "Maria" }
+*** old document "Max" is delected, when new document is inserted and the size of collection is exceeded ***
+
+
+===================
+What are Replica Sets?
+===================
+
+
+
+=====================
+Understanding Sharding (Horizontal Scaling)
+=====================
